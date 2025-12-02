@@ -25,8 +25,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        autopurchase.cpp
+        autopurchase.cpp \
+    excelloader.cpp
 
-HEADERS  += autopurchase.h
+HEADERS  += autopurchase.h \
+    excelloader.h
 
 FORMS    += autopurchase.ui
+
+RESOURCES += \
+    appresources.qrc

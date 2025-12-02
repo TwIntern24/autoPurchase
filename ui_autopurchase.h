@@ -13,11 +13,13 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QStatusBar>
-#include <QtWidgets/QTableView>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
 
@@ -27,7 +29,10 @@ class Ui_AutoPurchase
 {
 public:
     QWidget *centralWidget;
-    QTableView *tableView;
+    QListWidget *listWidgetChecklist;
+    QComboBox *comboExcel;
+    QLabel *labelLoading;
+    QLabel *labelStatus;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -39,13 +44,23 @@ public:
         AutoPurchase->resize(1153, 741);
         centralWidget = new QWidget(AutoPurchase);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
-        tableView = new QTableView(centralWidget);
-        tableView->setObjectName(QStringLiteral("tableView"));
-        tableView->setGeometry(QRect(150, 30, 841, 571));
+        listWidgetChecklist = new QListWidget(centralWidget);
+        listWidgetChecklist->setObjectName(QStringLiteral("listWidgetChecklist"));
+        listWidgetChecklist->setGeometry(QRect(160, 180, 641, 431));
+        comboExcel = new QComboBox(centralWidget);
+        comboExcel->setObjectName(QStringLiteral("comboExcel"));
+        comboExcel->setGeometry(QRect(370, 30, 121, 22));
+        labelLoading = new QLabel(centralWidget);
+        labelLoading->setObjectName(QStringLiteral("labelLoading"));
+        labelLoading->setGeometry(QRect(370, 100, 171, 41));
+        labelLoading->setAlignment(Qt::AlignCenter);
+        labelStatus = new QLabel(centralWidget);
+        labelStatus->setObjectName(QStringLiteral("labelStatus"));
+        labelStatus->setGeometry(QRect(740, 103, 131, 20));
         AutoPurchase->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(AutoPurchase);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1153, 26));
+        menuBar->setGeometry(QRect(0, 0, 1153, 21));
         AutoPurchase->setMenuBar(menuBar);
         mainToolBar = new QToolBar(AutoPurchase);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -62,6 +77,8 @@ public:
     void retranslateUi(QMainWindow *AutoPurchase)
     {
         AutoPurchase->setWindowTitle(QApplication::translate("AutoPurchase", "AutoPurchase", Q_NULLPTR));
+        labelLoading->setText(QApplication::translate("AutoPurchase", "l", Q_NULLPTR));
+        labelStatus->setText(QApplication::translate("AutoPurchase", "TextLabel", Q_NULLPTR));
     } // retranslateUi
 
 };

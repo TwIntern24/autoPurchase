@@ -14,14 +14,53 @@
    <string>AutoPurchase</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QTableView" name="tableView">
+   <widget class="QListWidget" name="listWidgetChecklist">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>30</y>
-      <width>841</width>
-      <height>571</height>
+      <x>160</x>
+      <y>180</y>
+      <width>641</width>
+      <height>431</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboExcel">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>30</y>
+      <width>121</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelLoading">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>100</y>
+      <width>171</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>l</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelStatus">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>103</y>
+      <width>131</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
     </property>
    </widget>
   </widget>
@@ -31,7 +70,7 @@
      <x>0</x>
      <y>0</y>
      <width>1153</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
