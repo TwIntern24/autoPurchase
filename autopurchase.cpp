@@ -15,6 +15,9 @@
 
 #include <QDir>
 #include <QFileInfo>
+#include <QMessageBox>
+
+#include <QSignalBlocker>
 
 AutoPurchase::AutoPurchase(QWidget *parent) :
     QMainWindow(parent),
@@ -22,6 +25,7 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->listWidgetChecklist->hide();
+    ui->listWidgetParts->hide();
 
     m_loadingMovie = new QMovie(":/gif/gif/g0R5.gif", QByteArray(), this);
        ui->labelLoading->setMovie(m_loadingMovie);
@@ -38,8 +42,8 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
         //  Example: add some Excel files with display name + full path
         // TODO: change these paths to your real file locations
     QString base = QCoreApplication::applicationDirPath();
-        ui->comboExcel->addItem("Double Fold",   base + "/../data/Repair_matrix_MK5 1.xlsx");
-        ui->comboExcel->addItem("MK5",  base + "/../data/Repair_matrix DF.xlsx");
+        ui->comboExcel->addItem("Double Fold",   base + "/../data/Repair_matrix DF.xlsx");
+        ui->comboExcel->addItem("MK5",  base + "/../data/Repair_matrix_MK5 1.xlsx");
 
         // 2) When user changes the selection, load that Excel
 
@@ -66,6 +70,36 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
                 QOverload<int>::of(&QComboBox::currentIndexChanged),
                 this,
                 &AutoPurchase::onExcelSelectionChanged);
+
+        m_materialThread = new QThread(this);
+            m_materialLoader = new ExcelLoader();
+            m_materialLoader->moveToThread(m_materialThread);
+
+            connect(m_materialThread, &QThread::finished,
+                    m_materialLoader, &QObject::deleteLater);
+
+            connect(this, &AutoPurchase::startMaterialsLoad,
+                    m_materialLoader, &ExcelLoader::loadFile);
+
+            connect(m_materialLoader, &ExcelLoader::loaded,
+                    this, &AutoPurchase::onMaterialsLoaded);
+
+            connect(m_materialLoader, &ExcelLoader::loadFailed,
+                    this, &AutoPurchase::onMaterialsLoadFailed);
+
+            m_materialThread->start();
+
+            QString materialsPath = base + "/../data/03_Inventory_v0.1.xlsx";
+            qDebug() << "Materials Excel path:" << materialsPath
+                     << "exists?" << QFileInfo(materialsPath).exists();
+            emit startMaterialsLoad(materialsPath);
+
+        connect(ui->listWidgetChecklist,
+                    &QListWidget::itemChanged,
+                    this,
+                    &AutoPurchase::onChecklistItemChanged);
+
+
 }
 
 AutoPurchase::~AutoPurchase()
@@ -74,203 +108,14 @@ AutoPurchase::~AutoPurchase()
             m_excelThread->quit();
             m_excelThread->wait();
         }
+    if (m_materialThread) {
+            m_materialThread->quit();
+            m_materialThread->wait();
+        }
     delete ui;
 }
 
-/*
-void AutoPurchase::loadXlsx(const QString &path)
-{
-    QAxObject excel("Excel.Application");
-        excel.setProperty("Visible", false);
 
-        QAxObject *workbooks = excel.querySubObject("Workbooks");
-        QAxObject *workbook = workbooks->querySubObject("Open(const QString&)", path);
-        QAxObject *sheet = workbook->querySubObject("Worksheets(int)", 1); // first sheet
-
-        auto *model = new QStandardItemModel(this);
-
-        // find used range
-        QAxObject *usedRange = sheet->querySubObject("UsedRange");
-        QAxObject *rows = usedRange->querySubObject("Rows");
-        QAxObject *cols = usedRange->querySubObject("Columns");
-
-        int rowCount = rows->property("Count").toInt();
-        int colCount = cols->property("Count").toInt();
-
-        // read cells
-        for (int r = 1; r <= rowCount; ++r) {
-            QList<QStandardItem*> rowItems;
-            for (int c = 1; c <= colCount; ++c) {
-                QAxObject *cell = sheet->querySubObject("Cells(int,int)", r, c);
-                rowItems << new QStandardItem(cell->property("Value").toString());
-            }
-            model->appendRow(rowItems);
-        }
-
-        ui->tableView->setModel(model);
-
-        workbook->dynamicCall("Close()");
-        excel.dynamicCall("Quit()");
-}
-*/
-
-/*
-void AutoPurchase::loadXlsx(const QString &path)
-{
-    QAxObject excel("Excel.Application");
-    excel.setProperty("Visible", false);
-
-    QAxObject *workbooks = excel.querySubObject("Workbooks");
-    QAxObject *workbook  = workbooks->querySubObject("Open(const QString&)", path);
-    QAxObject *sheet     = workbook->querySubObject("Worksheets(int)", 1); // first sheet
-
-    QAxObject *usedRange = sheet->querySubObject("UsedRange");
-    QVariant var         = usedRange->dynamicCall("Value()");
-
-    if (!var.isValid()) {
-        workbook->dynamicCall("Close()");
-        excel.dynamicCall("Quit()");
-        return;
-    }
-
-    QVariantList rows = var.toList();
-    if (rows.isEmpty()) {
-        workbook->dynamicCall("Close()");
-        excel.dynamicCall("Quit()");
-        return;
-    }
-
-    //  Only build checklist – no table model
-    buildChecklistFromExcelRows(rows);
-
-    workbook->dynamicCall("Close()");
-    excel.dynamicCall("Quit()");
-
-
-    int rowCount = rows.size();
-       int colCount = rows.first().toList().size();
-
-       m_model = new QStandardItemModel(this);
-       m_model->setColumnCount(colCount);
-       m_model->setRowCount(rowCount - 1);
-
-       QVariantList headerRow = rows[0].toList();
-       for (int c = 0; c < colCount; ++c) {
-           QString headerText = (c < headerRow.size() ? headerRow[c].toString() : QString());
-           m_model->setHeaderData(c, Qt::Horizontal, headerText);
-       }
-
-       for (int r = 1; r < rowCount; ++r) {
-           QVariantList rowData = rows[r].toList();
-           for (int c = 0; c < colCount; ++c) {
-               QString text = (c < rowData.size() ? rowData[c].toString() : QString());
-               m_model->setItem(r - 1, c, new QStandardItem(text));
-           }
-
-           //  Let UI update every 20 rows
-           if (r % 20 == 0) {
-               qApp->processEvents();
-           }
-       }
-
-       //ui->tableView->setModel(m_model);
-       //ui->tableView->resizeColumnsToContents();
-
-       // build checklist from rows
-       buildChecklistFromExcelRows(rows);
-
-       workbook->dynamicCall("Close()");
-       excel.dynamicCall("Quit()");
-}
-*/
-
-/*
-void AutoPurchase::loadXlsx(const QString &path)
-{
-    // 1) Start Excel (hidden)
-    QAxObject excel("Excel.Application");
-    excel.setProperty("Visible", false);
-
-    QAxObject *workbooks = excel.querySubObject("Workbooks");
-    QAxObject *workbook  = workbooks->querySubObject("Open(const QString&)", path);
-    if (!workbook) {
-        excel.dynamicCall("Quit()");
-        return;
-    }
-
-    // first worksheet
-    QAxObject *sheet = workbook->querySubObject("Worksheets(int)", 1);
-    if (!sheet) {
-        workbook->dynamicCall("Close()");
-        excel.dynamicCall("Quit()");
-        return;
-    }
-
-    // 2) Get all used cells as a QVariant
-    QAxObject *usedRange = sheet->querySubObject("UsedRange");
-    QVariant var         = usedRange->dynamicCall("Value()");
-
-    if (!var.isValid()) {
-        workbook->dynamicCall("Close()");
-        excel.dynamicCall("Quit()");
-        return;
-    }
-
-    QVariantList rows = var.toList();
-    if (rows.isEmpty()) {
-        workbook->dynamicCall("Close()");
-        excel.dynamicCall("Quit()");
-        return;
-    }
-
-    // give UI a chance to update spinner
-    qApp->processEvents();
-
-    // 3) Build checklist from those rows
-    buildChecklistFromExcelRows(rows);
-
-    // 4) Clean up COM objects
-    workbook->dynamicCall("Close()");
-    excel.dynamicCall("Quit()");
-}
-*/
-
-
-/*
-void AutoPurchase::onExcelSelectionChanged(int index)
-{
-    // Get file path stored in the selected combo item
-    QString path = ui->comboExcel->itemData(index).toString();
-
-    if (path.isEmpty()) {
-        // "Select Excel..." or invalid item – do nothing
-        ui->listWidgetChecklist->hide();
-        ui->listWidgetChecklist->clear();
-        return;
-    }
-
-    // Hide old checklist while new file loads
-        ui->listWidgetChecklist->hide();
-
-        // Show loading animation
-        ui->labelLoading->show();
-        if (m_loadingMovie) {
-            m_loadingMovie->start();
-        }
-        qApp->processEvents();  // let the UI update before heavy work
-
-    // Call your existing loader – it will build the checklist
-    loadXlsx(path);
-
-    if (m_loadingMovie) {
-           m_loadingMovie->stop();
-       }
-       ui->labelLoading->hide();
-
-       // Show checklist now that it has data
-       ui->listWidgetChecklist->show();
-}
-*/
 
 void AutoPurchase::onExcelSelectionChanged(int index)
 {
@@ -281,6 +126,7 @@ void AutoPurchase::onExcelSelectionChanged(int index)
         ui->listWidgetChecklist->clear();
         return;
     }
+
 
     ui->listWidgetChecklist->hide();
 
@@ -297,13 +143,14 @@ void AutoPurchase::onExcelLoaded(const QVariantList &rows)
     m_loadingMovie->stop();
     ui->labelLoading->hide();
 
-    ui->labelStatus->setText("Building checklist…");
-    qApp->processEvents();
+        ui->labelStatus->setText("Building checklist…");
+        qApp->processEvents();
 
-    buildChecklistFromExcelRows(rows);
+        buildChecklistFromExcelRows(rows);
 
-    ui->labelStatus->setText("Done");
-    ui->listWidgetChecklist->show();
+        ui->labelStatus->setText("Done");
+        ui->listWidgetChecklist->show();
+
 }
 
 void AutoPurchase::onExcelLoadFailed(const QString &error)
@@ -312,11 +159,25 @@ void AutoPurchase::onExcelLoadFailed(const QString &error)
     ui->labelLoading->hide();
 
     ui->labelStatus->setText("Error: " + error);
+    //qDebug() << "Excel load failed:" << error
+               // << "target:" << (m_currentLoadTarget == LoadMaterials ? "Materials" : "Matrix");
+}
+
+void AutoPurchase::onMaterialsLoaded(const QVariantList &rows)
+{
+    m_rowsMaterials = rows;
+    qDebug() << "Materials rows loaded:" << m_rowsMaterials.size();
+}
+
+void AutoPurchase::onMaterialsLoadFailed(const QString &error)
+{
+    qDebug() << "Materials Excel load failed:" << error;
 }
 
 
 void AutoPurchase::buildChecklistFromExcelRows(const QVariantList &rows)
 {
+    QSignalBlocker blocker(ui->listWidgetChecklist);
     ui->listWidgetChecklist->clear();
     if (rows.isEmpty())
         return;
@@ -332,10 +193,12 @@ void AutoPurchase::buildChecklistFromExcelRows(const QVariantList &rows)
     bool inUpgradeSection = false;
     bool inUpgradeTable   = false;
     bool inVisualSection  = false;
+    bool inAgeSection  = false;
 
-    enum Sec { None, Arm, DM, ZM };
+    enum Sec { None, Arm, DM, ZM, ArmAfter3or5year, DMAfter3or5year, ZMAfter5year };
     Sec current = None;
 
+    /*
     for (int r = 0; r < rows.size() && r < 80; ++r) {
         QVariantList cols = rows[r].toList();
         qDebug() << "Row" << (r + 1);
@@ -346,6 +209,7 @@ void AutoPurchase::buildChecklistFromExcelRows(const QVariantList &rows)
             }
         }
     }
+    */
 
     for (int r = 0; r < rows.size(); ++r)
     {
@@ -361,11 +225,22 @@ void AutoPurchase::buildChecklistFromExcelRows(const QVariantList &rows)
         //-----------------------------
         // 1) ENTER UPGRADE SECTION
         //-----------------------------
+        if (cleanA.startsWith("age"))
+        {
+            inAgeSection  = true;
+            inVisualSection = false;
+            inUpgradeSection = false;
+            inUpgradeTable = false;
+            current = None;
+            continue;
+        }
+
         if (cleanA.contains("lastdigit") && cleanA.contains("redmark"))
         {
             inUpgradeSection = true;
             inUpgradeTable = false;
             inVisualSection = false;
+            inAgeSection  = false;
             current = None;
             continue;
         }
@@ -378,6 +253,7 @@ void AutoPurchase::buildChecklistFromExcelRows(const QVariantList &rows)
             inVisualSection = true;
             inUpgradeSection = false;
             inUpgradeTable = false;
+            inAgeSection  = false;
             current = None;
             continue;
         }
@@ -397,17 +273,20 @@ void AutoPurchase::buildChecklistFromExcelRows(const QVariantList &rows)
             // blank line closes upgrade section
             if (colA.isEmpty() && colB.isEmpty())
             {
-                inUpgradeSection = false;
-                inUpgradeTable = false;
+                //inUpgradeSection = false;
+                //inUpgradeTable = false;
                 continue;
             }
 
             if (inUpgradeTable && !colA.isEmpty())
             {
-                QString label = QString("Upgrade: %1 (%2)").arg(colA, colB);
+                //QString label = QString("Upgrade: %1 (%2)").arg(colA, colB);
+                QString label = QString("Upgrade: %1").arg(colA);
                 auto *item = new QListWidgetItem(label, ui->listWidgetChecklist);
                 item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
                 item->setCheckState(Qt::Unchecked);
+
+                item->setData(Qt::UserRole, colB);
             }
 
             continue;
@@ -459,6 +338,61 @@ void AutoPurchase::buildChecklistFromExcelRows(const QVariantList &rows)
                 auto *item = new QListWidgetItem(label, ui->listWidgetChecklist);
                 item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
                 item->setCheckState(Qt::Unchecked);
+
+                QString matExpr = getCol(r, 2);  // set correct column index
+                item->setData(Qt::UserRole, matExpr);
+            }
+
+            continue;
+        }
+
+        if (inAgeSection)
+        {
+            //qDebug()<<cleanA;
+            // detect subgroup headings using safe match
+            if (cleanA == "armparts(after3,5years)")
+            {
+                current = ArmAfter3or5year;
+                continue;
+            }
+
+            if (cleanA.startsWith("drivemodule(dm)parts(after3,5years)"))
+            {
+                current = DMAfter3or5year;
+                continue;
+            }
+
+            if (cleanA.startsWith("z-strokemoduleparts(after5years)"))
+            {
+                current = ZMAfter5year;
+                continue;
+            }
+
+            // blank line resets subgroup
+            if (colA.isEmpty() && colB.isEmpty())
+            {
+                current = None;
+                continue;
+            }
+
+            //---------------------------
+            // add ARM/DM/ZM part item
+            //---------------------------
+            if (current != None && !colA.isEmpty())
+            {
+                QString prefix =
+                    (current == ArmAfter3or5year ? "Arm After 3,5 year: " :
+                     current == DMAfter3or5year  ? "DM After 3,5 year: "  :
+                                      "ZM After 5 year: ");
+
+                QString label = prefix + colA;
+
+                auto *item = new QListWidgetItem(label, ui->listWidgetChecklist);
+                item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+                item->setCheckState(Qt::Unchecked);
+
+                QString matExpr = getCol(r, 2);  // set correct column index
+                item->setData(Qt::UserRole, matExpr);
             }
 
             continue;
@@ -466,3 +400,147 @@ void AutoPurchase::buildChecklistFromExcelRows(const QVariantList &rows)
     }
 }
 
+
+QStringList AutoPurchase::findPartsForMaterial(const QString &expr) const
+{
+    QStringList result;
+
+    if (m_rowsMaterials.isEmpty()) {
+        result << QString("Materials Excel not loaded (expression: %1)").arg(expr);
+        return result;
+    }
+
+    // helper to read cell from materials Excel
+    auto getCol = [&](int r, int c) -> QString {
+        if (r < 0 || r >= m_rowsMaterials.size()) return "";
+        QVariantList cols = m_rowsMaterials[r].toList();
+        if (c < 0 || c >= cols.size()) return "";
+        return cols[c].toString().trimmed();
+    };
+
+    // 1) split by '+'  -> one token per material
+    QStringList tokens = expr.split('+', QString::SkipEmptyParts);
+
+    for (const QString &rawToken : tokens) {
+        QString token = rawToken.trimmed();   // e.g. "610846", "E-20953*2"
+
+        // 2) extract quantity (default 1)
+        int qty = 1;
+        int starPos = token.indexOf('*');
+        if (starPos >= 0) {
+            bool ok = false;
+            int q = token.mid(starPos + 1).toInt(&ok);   // text after '*'
+            if (ok && q > 0)
+                qty = q;
+            token = token.left(starPos);  // base id without "*2"
+        }
+
+        QString matId = token;           // e.g. "610846" or "E-20953"
+        //QString matIdLower = matId.toLower();
+        bool found = false;
+
+        // 3) search this single id in the materials Excel
+        //qDebug()<< m_rowsMaterials.size();
+        //for(int i=0; i<10; i++){
+            //qDebug()<<"i"+getCol(i,i);
+       // }
+        for (int r = 0; r < m_rowsMaterials.size(); ++r) {
+            QString id   = getCol(r, 1);   // column 0 = material ID
+            QString part = getCol(r, 5);   // column 1 = part name/number
+            QString desc = getCol(r, 3);   // column 2 = description (optional)
+            //qDebug()<< id+part+desc;
+
+            if (id.compare(matId, Qt::CaseInsensitive) == 0) {
+                QString line = QString("%1  x%2  -  %3")
+                                   .arg(id)
+                                   .arg(qty)
+                                   .arg(part);
+                if (!desc.isEmpty())
+                    line += " (" + desc + ")";
+                result << line;
+                found = true;
+                break;   // stop on first match
+            }
+        }
+
+        // 4) if not found, still show id + qty
+        if (!found) {
+            result << QString("%1  x%2  (no details found)")
+                         .arg(matId)
+                         .arg(qty);
+        }
+    }
+
+    if (result.isEmpty())
+        result << QString("No parts for expression: %1").arg(expr);
+
+    return result;
+}
+
+/*
+void AutoPurchase::onChecklistItemChanged(QListWidgetItem *item)
+{
+    if (!item)
+        return;
+
+    if (item->checkState() != Qt::Checked)
+        return;    // only when checked; you can add logic for unchecked if needed
+
+    // get the full expression from the hidden data
+    QString expr = item->data(Qt::UserRole).toString().trimmed();
+    qDebug() << "Expression from item:" << expr;
+
+    ui->listWidgetParts->clear();
+
+    if (expr.isEmpty()) {
+        ui->listWidgetParts->addItem("No material expression for this item.");
+        ui->listWidgetParts->show();
+        return;
+    }
+
+    QStringList lines = findPartsForMaterial(expr);
+    qDebug() << "Parts lines count:" << lines.size();
+
+    foreach (const QString &line, lines) {
+        ui->listWidgetParts->addItem(line);
+    }
+    ui->listWidgetParts->show();
+}
+*/
+
+
+void AutoPurchase::onChecklistItemChanged(QListWidgetItem * /*item*/)
+{
+    ui->listWidgetParts->clear();
+
+    if (m_rowsMaterials.isEmpty()) {
+        ui->listWidgetParts->addItem("Materials Excel not loaded yet.");
+        ui->listWidgetParts->show();
+        return;
+    }
+
+    bool anyChecked = false;
+
+    for (int i = 0; i < ui->listWidgetChecklist->count(); ++i) {
+        QListWidgetItem *it = ui->listWidgetChecklist->item(i);
+        if (it->checkState() != Qt::Checked)
+            continue;
+
+        anyChecked = true;
+
+        QString expr = it->data(Qt::UserRole).toString().trimmed();
+        if (expr.isEmpty())
+            continue;
+
+        ui->listWidgetParts->addItem("=== " + it->text() + " ===");
+
+        QStringList lines = findPartsForMaterial(expr);
+        foreach (const QString &line, lines)
+            ui->listWidgetParts->addItem("  " + line);
+    }
+
+    if (anyChecked)
+        ui->listWidgetParts->show();
+    else
+        ui->listWidgetParts->hide();
+}

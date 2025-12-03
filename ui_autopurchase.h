@@ -33,6 +33,7 @@ public:
     QComboBox *comboExcel;
     QLabel *labelLoading;
     QLabel *labelStatus;
+    QListWidget *listWidgetParts;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -46,17 +47,20 @@ public:
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         listWidgetChecklist = new QListWidget(centralWidget);
         listWidgetChecklist->setObjectName(QStringLiteral("listWidgetChecklist"));
-        listWidgetChecklist->setGeometry(QRect(160, 180, 641, 431));
+        listWidgetChecklist->setGeometry(QRect(220, 130, 481, 281));
         comboExcel = new QComboBox(centralWidget);
         comboExcel->setObjectName(QStringLiteral("comboExcel"));
         comboExcel->setGeometry(QRect(370, 30, 121, 22));
         labelLoading = new QLabel(centralWidget);
         labelLoading->setObjectName(QStringLiteral("labelLoading"));
-        labelLoading->setGeometry(QRect(370, 100, 171, 41));
+        labelLoading->setGeometry(QRect(350, 70, 171, 41));
         labelLoading->setAlignment(Qt::AlignCenter);
         labelStatus = new QLabel(centralWidget);
         labelStatus->setObjectName(QStringLiteral("labelStatus"));
         labelStatus->setGeometry(QRect(740, 103, 131, 20));
+        listWidgetParts = new QListWidget(centralWidget);
+        listWidgetParts->setObjectName(QStringLiteral("listWidgetParts"));
+        listWidgetParts->setGeometry(QRect(265, 450, 391, 221));
         AutoPurchase->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(AutoPurchase);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -78,7 +82,7 @@ public:
     {
         AutoPurchase->setWindowTitle(QApplication::translate("AutoPurchase", "AutoPurchase", Q_NULLPTR));
         labelLoading->setText(QApplication::translate("AutoPurchase", "l", Q_NULLPTR));
-        labelStatus->setText(QApplication::translate("AutoPurchase", "TextLabel", Q_NULLPTR));
+        labelStatus->setText(QString());
     } // retranslateUi
 
 };
