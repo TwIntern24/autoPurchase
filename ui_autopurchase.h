@@ -20,6 +20,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QStatusBar>
+#include <QtWidgets/QTableWidget>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
 
@@ -33,7 +34,7 @@ public:
     QComboBox *comboExcel;
     QLabel *labelLoading;
     QLabel *labelStatus;
-    QListWidget *listWidgetParts;
+    QTableWidget *tableWidgetParts;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -58,9 +59,9 @@ public:
         labelStatus = new QLabel(centralWidget);
         labelStatus->setObjectName(QStringLiteral("labelStatus"));
         labelStatus->setGeometry(QRect(740, 103, 131, 20));
-        listWidgetParts = new QListWidget(centralWidget);
-        listWidgetParts->setObjectName(QStringLiteral("listWidgetParts"));
-        listWidgetParts->setGeometry(QRect(265, 450, 391, 221));
+        tableWidgetParts = new QTableWidget(centralWidget);
+        tableWidgetParts->setObjectName(QStringLiteral("tableWidgetParts"));
+        tableWidgetParts->setGeometry(QRect(225, 450, 481, 221));
         AutoPurchase->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(AutoPurchase);
         menuBar->setObjectName(QStringLiteral("menuBar"));

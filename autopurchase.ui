@@ -63,12 +63,12 @@
      <string/>
     </property>
    </widget>
-   <widget class="QListWidget" name="listWidgetParts">
+   <widget class="QTableWidget" name="tableWidgetParts">
     <property name="geometry">
      <rect>
-      <x>265</x>
+      <x>225</x>
       <y>450</y>
-      <width>391</width>
+      <width>481</width>
       <height>221</height>
      </rect>
     </property>
