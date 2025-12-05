@@ -61,7 +61,7 @@ public:
         labelStatus->setGeometry(QRect(740, 103, 131, 20));
         tableWidgetParts = new QTableWidget(centralWidget);
         tableWidgetParts->setObjectName(QStringLiteral("tableWidgetParts"));
-        tableWidgetParts->setGeometry(QRect(225, 450, 481, 221));
+        tableWidgetParts->setGeometry(QRect(175, 450, 591, 231));
         AutoPurchase->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(AutoPurchase);
         menuBar->setObjectName(QStringLiteral("menuBar"));

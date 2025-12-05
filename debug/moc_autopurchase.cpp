@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_AutoPurchase_t {
-    QByteArrayData data[22];
-    char stringdata0[332];
+    QByteArrayData data[23];
+    char stringdata0[358];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -49,10 +49,11 @@ QT_MOC_LITERAL(14, 183, 21), // "onMaterialsLoadFailed"
 QT_MOC_LITERAL(15, 205, 22), // "onChecklistItemChanged"
 QT_MOC_LITERAL(16, 228, 16), // "QListWidgetItem*"
 QT_MOC_LITERAL(17, 245, 4), // "item"
-QT_MOC_LITERAL(18, 250, 18), // "onArmUpgradeLoaded"
-QT_MOC_LITERAL(19, 269, 22), // "onArmUpgradeLoadFailed"
-QT_MOC_LITERAL(20, 292, 17), // "onDmUpgradeLoaded"
-QT_MOC_LITERAL(21, 310, 21) // "onDmUpgradeLoadFailed"
+QT_MOC_LITERAL(18, 250, 25), // "rebuildPartsFromChecklist"
+QT_MOC_LITERAL(19, 276, 18), // "onArmUpgradeLoaded"
+QT_MOC_LITERAL(20, 295, 22), // "onArmUpgradeLoadFailed"
+QT_MOC_LITERAL(21, 318, 17), // "onDmUpgradeLoaded"
+QT_MOC_LITERAL(22, 336, 21) // "onDmUpgradeLoadFailed"
 
     },
     "AutoPurchase\0startExcelLoad\0\0path\0"
@@ -61,7 +62,8 @@ QT_MOC_LITERAL(21, 310, 21) // "onDmUpgradeLoadFailed"
     "index\0onExcelLoaded\0rows\0onExcelLoadFailed\0"
     "error\0onMaterialsLoaded\0onMaterialsLoadFailed\0"
     "onChecklistItemChanged\0QListWidgetItem*\0"
-    "item\0onArmUpgradeLoaded\0onArmUpgradeLoadFailed\0"
+    "item\0rebuildPartsFromChecklist\0"
+    "onArmUpgradeLoaded\0onArmUpgradeLoadFailed\0"
     "onDmUpgradeLoaded\0onDmUpgradeLoadFailed"
 };
 #undef QT_MOC_LITERAL
@@ -72,7 +74,7 @@ static const uint qt_meta_data_AutoPurchase[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      14,   14, // methods
+      15,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -80,22 +82,23 @@ static const uint qt_meta_data_AutoPurchase[] = {
        4,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   84,    2, 0x06 /* Public */,
-       4,    1,   87,    2, 0x06 /* Public */,
-       5,    1,   90,    2, 0x06 /* Public */,
-       6,    1,   93,    2, 0x06 /* Public */,
+       1,    1,   89,    2, 0x06 /* Public */,
+       4,    1,   92,    2, 0x06 /* Public */,
+       5,    1,   95,    2, 0x06 /* Public */,
+       6,    1,   98,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       7,    1,   96,    2, 0x08 /* Private */,
-       9,    1,   99,    2, 0x08 /* Private */,
-      11,    1,  102,    2, 0x08 /* Private */,
-      13,    1,  105,    2, 0x08 /* Private */,
-      14,    1,  108,    2, 0x08 /* Private */,
-      15,    1,  111,    2, 0x08 /* Private */,
-      18,    1,  114,    2, 0x08 /* Private */,
-      19,    1,  117,    2, 0x08 /* Private */,
-      20,    1,  120,    2, 0x08 /* Private */,
-      21,    1,  123,    2, 0x08 /* Private */,
+       7,    1,  101,    2, 0x08 /* Private */,
+       9,    1,  104,    2, 0x08 /* Private */,
+      11,    1,  107,    2, 0x08 /* Private */,
+      13,    1,  110,    2, 0x08 /* Private */,
+      14,    1,  113,    2, 0x08 /* Private */,
+      15,    1,  116,    2, 0x08 /* Private */,
+      18,    0,  119,    2, 0x08 /* Private */,
+      19,    1,  120,    2, 0x08 /* Private */,
+      20,    1,  123,    2, 0x08 /* Private */,
+      21,    1,  126,    2, 0x08 /* Private */,
+      22,    1,  129,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString,    3,
@@ -110,6 +113,7 @@ static const uint qt_meta_data_AutoPurchase[] = {
     QMetaType::Void, QMetaType::QVariantList,   10,
     QMetaType::Void, QMetaType::QString,   12,
     QMetaType::Void, 0x80000000 | 16,   17,
+    QMetaType::Void,
     QMetaType::Void, QMetaType::QVariantList,   10,
     QMetaType::Void, QMetaType::QString,   12,
     QMetaType::Void, QMetaType::QVariantList,   10,
@@ -134,10 +138,11 @@ void AutoPurchase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         case 7: _t->onMaterialsLoaded((*reinterpret_cast< const QVariantList(*)>(_a[1]))); break;
         case 8: _t->onMaterialsLoadFailed((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 9: _t->onChecklistItemChanged((*reinterpret_cast< QListWidgetItem*(*)>(_a[1]))); break;
-        case 10: _t->onArmUpgradeLoaded((*reinterpret_cast< const QVariantList(*)>(_a[1]))); break;
-        case 11: _t->onArmUpgradeLoadFailed((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 12: _t->onDmUpgradeLoaded((*reinterpret_cast< const QVariantList(*)>(_a[1]))); break;
-        case 13: _t->onDmUpgradeLoadFailed((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 10: _t->rebuildPartsFromChecklist(); break;
+        case 11: _t->onArmUpgradeLoaded((*reinterpret_cast< const QVariantList(*)>(_a[1]))); break;
+        case 12: _t->onArmUpgradeLoadFailed((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 13: _t->onDmUpgradeLoaded((*reinterpret_cast< const QVariantList(*)>(_a[1]))); break;
+        case 14: _t->onDmUpgradeLoadFailed((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -199,13 +204,13 @@ int AutoPurchase::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 14)
+        if (_id < 15)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 14;
+        _id -= 15;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 14)
+        if (_id < 15)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 14;
+        _id -= 15;
     }
     return _id;
 }

@@ -32,6 +32,9 @@ public:
             int     qty = 1;
             bool    found = false;
 
+            QString checklistName;
+            int     subOrder = 0;
+
             bool hasId() const       { return !materialId.isEmpty(); }
             bool hasStorage() const  { return !storage.isEmpty(); }
         };
@@ -55,6 +58,8 @@ private slots:
 
     void onChecklistItemChanged(QListWidgetItem *item);
 
+    void rebuildPartsFromChecklist();   // new helper
+
     void onArmUpgradeLoaded(const QVariantList &rows);
     void onArmUpgradeLoadFailed(const QString &error);
     void onDmUpgradeLoaded(const QVariantList &rows);
@@ -64,6 +69,8 @@ private slots:
 private:
     Ui::AutoPurchase *ui;
     //QStandardItemModel *m_model = nullptr;
+
+    bool m_rebuildPending = false;
 
     QMovie *m_loadingMovie = nullptr;
     //QMovie *m_model = nullptr;

@@ -23,6 +23,8 @@
 #include <QLabel>
 #include <QSpinBox>
 
+#include <QTimer>
+
 AutoPurchase::AutoPurchase(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::AutoPurchase)
@@ -59,6 +61,9 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
     QString base = QCoreApplication::applicationDirPath();
         ui->comboExcel->addItem("Double Fold",   base + "/../data/Repair_matrix DF.xlsx");
         ui->comboExcel->addItem("MK5",  base + "/../data/Repair_matrix_MK5 1.xlsx");
+
+        ui->tableWidgetParts->horizontalHeader()
+            ->setSectionResizeMode(QHeaderView::ResizeToContents);
 
         // 2) When user changes the selection, load that Excel
 
@@ -122,7 +127,7 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
         connect(m_armThread, &QThread::finished,
                 m_armLoader, &QObject::deleteLater);
 
-        connect(this, &AutoPurchase::startMaterialsLoad,  // or add a new signal if you prefer
+        connect(this, &AutoPurchase::startArmUpgradeLoad,  // or add a new signal if you prefer
                 m_armLoader, &ExcelLoader::loadFile);
 
         connect(m_armLoader, &ExcelLoader::loaded,
@@ -137,6 +142,7 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
         qDebug() << "ARM upgrade Excel:" << armPath << QFileInfo(armPath).exists();
         emit startArmUpgradeLoad(armPath);   // or a separate signal if you made one
 
+
         // ---------- DM LIKA UPGRADE EXCEL ----------
         m_dmThread = new QThread(this);
         m_dmLoader = new ExcelLoader();
@@ -145,7 +151,7 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
         connect(m_dmThread, &QThread::finished,
                 m_dmLoader, &QObject::deleteLater);
 
-        connect(this, &AutoPurchase::startMaterialsLoad,   // or a dedicated signal
+        connect(this, &AutoPurchase::startDmUpgradeLoad,   // or a dedicated signal
                 m_dmLoader, &ExcelLoader::loadFile);
 
         connect(m_dmLoader, &ExcelLoader::loaded,
@@ -160,6 +166,8 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
         qDebug() << "DM Lika Excel:" << dmPath << QFileInfo(dmPath).exists();
         emit startDmUpgradeLoad(dmPath);
 
+        //ui->tableWidgetParts->horizontalHeader()
+          //  ->setSectionResizeMode(QHeaderView::ResizeToContents);
 
 }
 
@@ -492,141 +500,7 @@ void AutoPurchase::buildChecklistFromExcelRows(const QVariantList &rows)
     }
 }
 
-/*
-QStringList AutoPurchase::findPartsForMaterial(const QString &expr) const
-{
-    QStringList result;
 
-    if (m_rowsMaterials.isEmpty()) {
-        result << QString("Materials Excel not loaded (expression: %1)").arg(expr);
-        return result;
-    }
-
-    // helper to read cell from materials Excel
-    auto getCol = [&](int r, int c) -> QString {
-        if (r < 0 || r >= m_rowsMaterials.size()) return "";
-        QVariantList cols = m_rowsMaterials[r].toList();
-        if (c < 0 || c >= cols.size()) return "";
-        return cols[c].toString().trimmed();
-    };
-
-    // 1) split by '+'  -> one token per material
-    QStringList tokens = expr.split('+', QString::SkipEmptyParts);
-
-    for (const QString &rawToken : tokens) {
-        QString token = rawToken.trimmed();   // e.g. "610846", "E-20953*2"
-
-        // 2) extract quantity (default 1)
-        int qty = 1;
-        int starPos = token.indexOf('*');
-        if (starPos >= 0) {
-            bool ok = false;
-            int q = token.mid(starPos + 1).toInt(&ok);   // text after '*'
-            if (ok && q > 0)
-                qty = q;
-            token = token.left(starPos);  // base id without "*2"
-        }
-
-        QString matId = token;           // e.g. "610846" or "E-20953"
-        //QString matIdLower = matId.toLower();
-        bool found = false;
-
-        // 3) search this single id in the materials Excel
-        //qDebug()<< m_rowsMaterials.size();
-        //for(int i=0; i<10; i++){
-            //qDebug()<<"i"+getCol(i,i);
-       // }
-        for (int r = 0; r < m_rowsMaterials.size(); ++r) {
-            QString id   = getCol(r, 1);   // column 0 = material ID
-            QString part = getCol(r, 5);   // column 1 = part name/number
-            QString desc = getCol(r, 3);   // column 2 = description (optional)
-            //qDebug()<< id+part+desc;
-
-            if (id.compare(matId, Qt::CaseInsensitive) == 0) {
-                QString line = QString("%1  x%2  -  %3")
-                                   .arg(id)
-                                   .arg(qty)
-                                   .arg(part);
-                if (!desc.isEmpty())
-                    line += " (" + desc + ")";
-                result << line;
-                found = true;
-                break;   // stop on first match
-            }
-        }
-
-        // 4) if not found, still show id + qty
-        if (!found) {
-            result << QString("%1  x%2  (no details found)")
-                         .arg(matId)
-                         .arg(qty);
-        }
-    }
-
-    if (result.isEmpty())
-        result << QString("No parts for expression: %1").arg(expr);
-
-    return result;
-}
-*/
-
-/*
-QList<AutoPurchase::PartInfo>
-AutoPurchase::findPartsForMaterial(const QString &expr) const
-{
-    QList<PartInfo> result;
-
-    if (m_rowsMaterials.isEmpty()) {
-        // still return something so caller can show a message if needed
-        return result;
-    }
-
-    auto getCol = [&](int r, int c) -> QString {
-        if (r < 0 || r >= m_rowsMaterials.size()) return "";
-        QVariantList cols = m_rowsMaterials[r].toList();
-        if (c < 0 || c >= cols.size()) return "";
-        return cols[c].toString().trimmed();
-    };
-
-    QStringList tokens = expr.split('+', QString::SkipEmptyParts);
-
-    for (const QString &rawToken : tokens) {
-        QString token = rawToken.trimmed();   // "610846", "E-20953*2"
-
-        int qty = 1;
-        int starPos = token.indexOf('*');
-        if (starPos >= 0) {
-            bool ok = false;
-            int q = token.mid(starPos + 1).toInt(&ok);
-            if (ok && q > 0)
-                qty = q;
-            token = token.left(starPos);  // remove "*2"
-        }
-
-        PartInfo info;
-        info.materialId = token;
-        info.qty        = qty;
-        info.found      = false;
-
-        for (int r = 0; r < m_rowsMaterials.size(); ++r) {
-            QString id   = getCol(r, 1);  // material ID
-            QString part = getCol(r, 5);  // part name
-            QString desc = getCol(r, 3);  // description (optional)
-
-            if (id.compare(info.materialId, Qt::CaseInsensitive) == 0) {
-                info.part        = part;
-                info.description = desc;
-                info.found       = true;
-                break;
-            }
-        }
-
-        result.append(info);
-    }
-
-    return result;
-}
-*/
 
 QList<AutoPurchase::PartInfo>
 AutoPurchase::findPartsForMaterial(const QString &expr) const
@@ -685,165 +559,51 @@ AutoPurchase::findPartsForMaterial(const QString &expr) const
     return result;
 }
 
-/*
-void AutoPurchase::addPartRow(const PartInfo &p)
-{
-    auto *item = new QListWidgetItem(ui->listWidgetParts);
-    item->setSizeHint(QSize(0, 26));
 
-    QWidget *rowWidget = new QWidget(ui->listWidgetParts);
-    auto *layout = new QHBoxLayout(rowWidget);
-    layout->setContentsMargins(4, 0, 4, 0);
-
-    QString text;
-    if (p.found) {
-        text = QString("%1 - %2").arg(p.materialId, p.part);
-    } else {
-        text = QString("%1 (no details found)").arg(p.materialId);
-    }
-    if (!p.description.isEmpty())
-        text += " (" + p.description + ")";
-
-    auto *lbl  = new QLabel(text, rowWidget);
-    auto *spin = new QSpinBox(rowWidget);
-    spin->setMinimum(0);
-    spin->setMaximum(9999);
-    spin->setValue(p.qty);      // default from Excel (*2 etc.)
-
-    layout->addWidget(lbl);
-    layout->addStretch();
-    layout->addWidget(spin);
-
-    rowWidget->setLayout(layout);
-    ui->listWidgetParts->addItem(item);
-    ui->listWidgetParts->setItemWidget(item, rowWidget);
-
-    // store id + qty in the item if you need them later
-    item->setData(Qt::UserRole,     p.materialId);
-    item->setData(Qt::UserRole + 1, p.qty);
-
-    connect(spin, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, [item](int v){
-                item->setData(Qt::UserRole + 1, v);
-            });
-}
-*/
-
-/*
-void AutoPurchase::onChecklistItemChanged(QListWidgetItem *item)
-{
-    if (!item)
-        return;
-
-    if (item->checkState() != Qt::Checked)
-        return;    // only when checked; you can add logic for unchecked if needed
-
-    // get the full expression from the hidden data
-    QString expr = item->data(Qt::UserRole).toString().trimmed();
-    qDebug() << "Expression from item:" << expr;
-
-    ui->listWidgetParts->clear();
-
-    if (expr.isEmpty()) {
-        ui->listWidgetParts->addItem("No material expression for this item.");
-        ui->listWidgetParts->show();
-        return;
-    }
-
-    QStringList lines = findPartsForMaterial(expr);
-    qDebug() << "Parts lines count:" << lines.size();
-
-    foreach (const QString &line, lines) {
-        ui->listWidgetParts->addItem(line);
-    }
-    ui->listWidgetParts->show();
-}
-*/
-
-//void AutoPurchase::onChecklistItemChanged(QListWidgetItem * /*item*/)
-/*
-{
-    ui->listWidgetParts->clear();
-
-    if (m_rowsMaterials.isEmpty()) {
-        ui->listWidgetParts->addItem("Materials Excel not loaded yet.");
-        ui->listWidgetParts->show();
-        return;
-    }
-
-    bool anyChecked = false;
-
-    for (int i = 0; i < ui->listWidgetChecklist->count(); ++i) {
-        QListWidgetItem *it = ui->listWidgetChecklist->item(i);
-        if (it->checkState() != Qt::Checked)
-            continue;
-
-        anyChecked = true;
-
-        QString expr = it->data(Qt::UserRole).toString().trimmed();
-        if (expr.isEmpty())
-            continue;
-
-        ui->listWidgetParts->addItem("=== " + it->text() + " ===");
-
-        QStringList lines = findPartsForMaterial(expr);
-        foreach (const QString &line, lines)
-            ui->listWidgetParts->addItem("  " + line);
-    }
-
-    if (anyChecked)
-        ui->listWidgetParts->show();
-    else
-        ui->listWidgetParts->hide();
-}
-*/
-
-
-//void AutoPurchase::onChecklistItemChanged(QListWidgetItem * /*item*/)
-/*
-{
-    ui->listWidgetParts->clear();
-
-    if (m_rowsMaterials.isEmpty()) {
-        ui->listWidgetParts->addItem("Materials Excel not loaded yet.");
-        ui->listWidgetParts->show();
-        return;
-    }
-
-    bool anyChecked = false;
-
-    for (int i = 0; i < ui->listWidgetChecklist->count(); ++i) {
-        QListWidgetItem *it = ui->listWidgetChecklist->item(i);
-        if (it->checkState() != Qt::Checked)
-            continue;
-
-        anyChecked = true;
-
-        QString expr = it->data(Qt::UserRole).toString().trimmed();
-        if (expr.isEmpty())
-            continue;
-
-        // header line for that checklist item
-        ui->listWidgetParts->addItem("=== " + it->text() + " ===");
-
-        QList<PartInfo> parts = findPartsForMaterial(expr);
-        for (const PartInfo &p : parts)
-            addPartRow(p);
-    }
-
-    if (anyChecked)
-        ui->listWidgetParts->show();
-    else
-        ui->listWidgetParts->hide();
-}
-*/
 
 void AutoPurchase::onChecklistItemChanged(QListWidgetItem * /*item*/)
 {
+    /*
+    // just schedule rebuild once; UI can update immediately
+    if (m_rebuildPending)
+        return;
+
+    m_rebuildPending = true;
+    QTimer::singleShot(50, this, &AutoPurchase::rebuildPartsFromChecklist);
+    */
+    rebuildPartsFromChecklist();
+}
+
+/*
+void AutoPurchase::rebuildPartsFromChecklist()
+{
+    //m_rebuildPending = false;
+
+    ui->tableWidgetParts->setUpdatesEnabled(false);
     ui->tableWidgetParts->setRowCount(0);
+
+    // 0) If no checklist item is checked, just clear & hide the table
+        bool anyChecked = false;
+        for (int i = 0; i < ui->listWidgetChecklist->count(); ++i) {
+            QListWidgetItem *it = ui->listWidgetChecklist->item(i);
+            if (it->checkState() == Qt::Checked) {
+                anyChecked = true;
+                break;
+            }
+        }
+
+        if (!anyChecked) {
+            //ui->tableWidgetParts->setRowCount(0);
+            ui->tableWidgetParts->hide();
+            ui->tableWidgetParts->setUpdatesEnabled(true);
+            return;
+        }
+
+
 
     if (m_rowsMaterials.isEmpty()) {
         ui->tableWidgetParts->hide();
+        ui->tableWidgetParts->setUpdatesEnabled(true);
         return;
     }
 
@@ -855,88 +615,364 @@ void AutoPurchase::onChecklistItemChanged(QListWidgetItem * /*item*/)
             continue;
 
         QString expr = it->data(Qt::UserRole).toString().trimmed();
-        if (expr.isEmpty())
+        QString checklistLabel = it->text();
+        if (expr.isEmpty()){
+            PartInfo p;
+                        //p.materialId    = "-";              // no ID
+                        p.materialId.clear();
+                        p.part          = QString("No material ID for: %1").arg(checklistLabel);  // show the checklist text
+                        p.storage       = "-";
+                        p.qty           = 0;
+                        p.found         = false;
+                        p.checklistName = checklistLabel;
+                        p.subOrder      = 99;               // normal group
+                        allParts.append(p);
             continue;
+        }
 
-        //QList<PartInfo> parts = findPartsForMaterial(expr);
+
+
+        //QString checklistLabel = it->text();
+        QString e = expr.toLower().remove(' ').remove('-');  // robust match
 
         QList<PartInfo> parts;
 
-        QString e = expr.toLower();
-
-        if (e == "arm a" || e == "arma") {
+        /*
+        if (e.contains("arma")) {
             parts = findArmUpgradeParts(true);
-        } else if (e == "arm b" || e == "armb") {
+        } else if (e.contains("armb")) {
             parts = findArmUpgradeParts(false);
-        } else if (e.contains("dm") && e.contains("lika")) {
+        } else if (e.contains("dmlika")) {
             parts = findDmUpgradeParts();
         } else {
-            // normal behaviour: parse "610846+E-20953*2" etc.
             parts = findPartsForMaterial(expr);
+        }
+
+        for (PartInfo &p : parts) {
+            p.checklistName = checklistLabel;
+        }
+*/
+/*
+        if (e.contains("arma")) {
+                    parts = findArmUpgradeParts(true);
+                    for (PartInfo &p : parts) {
+                        p.checklistName = checklistLabel;
+                        p.subOrder      = 1;   // ARM A
+                    }
+                } else if (e.contains("armb")) {
+                    parts = findArmUpgradeParts(false);
+                    for (PartInfo &p : parts) {
+                        p.checklistName = checklistLabel;
+                        p.subOrder      = 2;   // ARM B
+                    }
+                } else if (e.contains("dmlika")) {
+                    parts = findDmUpgradeParts();
+                    for (PartInfo &p : parts) {
+                        p.checklistName = checklistLabel;
+                        p.subOrder      = 3;   // DM Lika
+                    }
+                } else {
+                    parts = findPartsForMaterial(expr);
+                    for (PartInfo &p : parts) {
+                        p.checklistName = checklistLabel;
+                        p.subOrder      = 0;   // normal checklist parts
+                    }
+                }
+
+
+        allParts.append(parts);
+    }
+
+    if (!allParts.isEmpty()) {
+        rebuildPartsTable(allParts);
+        ui->tableWidgetParts->show();
+    } else {
+        ui->tableWidgetParts->hide();
+    }
+
+    ui->tableWidgetParts->resizeColumnToContents(0);
+    ui->tableWidgetParts->resizeColumnToContents(1); // only item-name col
+    ui->tableWidgetParts->setUpdatesEnabled(true);
+}
+*/
+
+void AutoPurchase::rebuildPartsFromChecklist()
+{
+    ui->tableWidgetParts->setUpdatesEnabled(false);
+    ui->tableWidgetParts->setRowCount(0);
+
+    if (m_rowsMaterials.isEmpty()) {
+        ui->tableWidgetParts->hide();
+        ui->tableWidgetParts->setUpdatesEnabled(true);
+        return;
+    }
+
+    QList<PartInfo> allParts;
+
+    for (int i = 0; i < ui->listWidgetChecklist->count(); ++i) {
+        QListWidgetItem *it = ui->listWidgetChecklist->item(i);
+        if (it->checkState() != Qt::Checked)
+            continue;
+
+        QString expr           = it->data(Qt::UserRole).toString().trimmed();
+        QString checklistLabel = it->text();
+
+        // ---- case: no material ID for this checklist item ----
+        if (expr.isEmpty()) {
+            PartInfo p;
+            p.materialId.clear();   // no ID → goes to bottom
+            p.part          = QString("No material ID for: %1").arg(checklistLabel);
+            p.storage       = "-";
+            p.qty           = 0;
+            p.found         = false;
+            p.checklistName = checklistLabel;
+            p.subOrder      = 99;   // normal group, sorted after real parts
+            allParts.append(p);
+            continue;
+        }
+
+        // ---- normal / special expressions ----
+        QString e = expr.toLower().remove(' ').remove('-');
+        QList<PartInfo> parts;
+
+        if (e.contains("arma")) {
+            parts = findArmUpgradeParts(true);
+            for (PartInfo &p : parts) {
+                p.checklistName = checklistLabel;
+                p.subOrder      = 1;   // ARM A
+            }
+        } else if (e.contains("armb")) {
+            parts = findArmUpgradeParts(false);
+            for (PartInfo &p : parts) {
+                p.checklistName = checklistLabel;
+                p.subOrder      = 2;   // ARM B
+            }
+        } else if (e.contains("dmlika")) {
+            parts = findDmUpgradeParts();
+            for (PartInfo &p : parts) {
+                p.checklistName = checklistLabel;
+                p.subOrder      = 3;   // DM Lika
+            }
+        } else {
+            parts = findPartsForMaterial(expr);
+            for (PartInfo &p : parts) {
+                p.checklistName = checklistLabel;
+                p.subOrder      = 0;   // normal parts
+            }
         }
 
         allParts.append(parts);
     }
 
-    if (allParts.isEmpty()) {
+    //  Decide show/hide ONLY from allParts
+    if (!allParts.isEmpty()) {
+        rebuildPartsTable(allParts);
+        ui->tableWidgetParts->show();
+    } else {
         ui->tableWidgetParts->hide();
-        return;
     }
 
-    // sort: 1) items with ID first, 2) then with storage, 3) then by storage text
-    std::sort(allParts.begin(), allParts.end(),
-              [](const PartInfo &a, const PartInfo &b) {
-                  // no ID -> go to bottom
-                  if (a.hasId() != b.hasId())
-                      return a.hasId() && !b.hasId();
-
-                  // both have ID: those *with* storage before those without
-                  if (a.hasStorage() != b.hasStorage())
-                      return a.hasStorage() && !b.hasStorage();
-
-                  // both have (or both don't have) storage: sort by storage text
-                  if (a.storage != b.storage)
-                      return a.storage < b.storage;
-
-                  // tie-breaker: by material id
-                  return a.materialId < b.materialId;
-              });
-
-    rebuildPartsTable(allParts);
-    ui->tableWidgetParts->show();
+    ui->tableWidgetParts->resizeColumnToContents(0);
+    ui->tableWidgetParts->resizeColumnToContents(1);
+    ui->tableWidgetParts->setUpdatesEnabled(true);
 }
+
 
 
 void AutoPurchase::rebuildPartsTable(const QList<PartInfo> &allParts)
 {
     ui->tableWidgetParts->setRowCount(0);
 
+    if (allParts.isEmpty())
+        return;
+
+    // 1) Group by checklistName, but keep insertion order of groups
+    QMap<QString, QList<PartInfo>> grouped;
+    QStringList groupOrder;
+
     for (const PartInfo &p : allParts) {
-        int row = ui->tableWidgetParts->rowCount();
-        ui->tableWidgetParts->insertRow(row);
+        QString key = p.checklistName;
+        if (key.isEmpty())
+            key = "Others";
 
-        // Material Number
-        auto *matItem = new QTableWidgetItem(p.materialId);
-        ui->tableWidgetParts->setItem(row, 0, matItem);
+        if (!grouped.contains(key))
+            groupOrder.append(key);
 
-        // Item Name
-        QString itemName = p.part;
-        if (!p.found && itemName.isEmpty())
-            itemName = "(no details found)";
-        auto *nameItem = new QTableWidgetItem(itemName);
-        ui->tableWidgetParts->setItem(row, 1, nameItem);
-
-        // Storage Location (bracket text)
-        auto *storItem = new QTableWidgetItem(p.storage);
-        ui->tableWidgetParts->setItem(row, 2, storItem);
-
-        // Quantity as editable spinbox
-        auto *spin = new QSpinBox(ui->tableWidgetParts);
-        spin->setMinimum(0);
-        spin->setMaximum(9999);
-        spin->setValue(p.qty);
-        ui->tableWidgetParts->setCellWidget(row, 3, spin);
+        grouped[key].append(p);
     }
+
+    /*
+    // 2) For each group, sort by storage (and then by materialId)
+    auto partLess = [](const PartInfo &a, const PartInfo &b) {
+        if (a.storage != b.storage)
+            return a.storage < b.storage;
+        return a.materialId < b.materialId;
+    };
+    */
+
+/*
+    auto partLess = [](const PartInfo &a, const PartInfo &b) {
+        if (a.subOrder != b.subOrder)
+            return a.subOrder < b.subOrder;      // normal → ARM A → ARM B → DM
+
+        if (a.storage != b.storage)
+            return a.storage < b.storage;
+
+        return a.materialId < b.materialId;
+    };
+    */
+
+    auto partLess = [](const PartInfo &a, const PartInfo &b) {
+        if (a.subOrder != b.subOrder)
+            return a.subOrder < b.subOrder;      // normal → ARM A → ARM B → DM
+
+       // bool aHasId = !a.materialId.trimmed().isEmpty() && a.materialId != "-";;
+       // bool bHasId = !b.materialId.trimmed().isEmpty() && b.materialId != "-";;
+        bool aHasId = !a.materialId.trimmed().isEmpty();
+        bool bHasId = !b.materialId.trimmed().isEmpty();
+        if (aHasId != bHasId)
+            return aHasId && !bHasId;            // rows with ID first, no-ID rows last
+
+        if (a.storage != b.storage)
+            return a.storage < b.storage;
+
+        return a.materialId < b.materialId;
+    };
+
+    QStringList normalGroups;
+    QStringList noIdGroups;
+
+
+    for (const QString &name : groupOrder) {
+        const QList<PartInfo> &parts = grouped[name];
+
+        bool hasRealId = false;
+        for (const PartInfo &p : parts) {
+            if (!p.materialId.trimmed().isEmpty() && p.materialId != "-") {
+                hasRealId = true;
+                break;
+            }
+        }
+
+        if (hasRealId)
+            normalGroups.append(name);
+        else
+            noIdGroups.append(name);
+    }
+    QStringList finalOrder = normalGroups + noIdGroups;
+
+
+    for (const QString &groupName : finalOrder) {
+        QList<PartInfo> parts = grouped[groupName];
+        std::sort(parts.begin(), parts.end(), partLess);
+
+        // 3) Insert header row for this checklist
+        int headerRow = ui->tableWidgetParts->rowCount();
+        ui->tableWidgetParts->insertRow(headerRow);
+
+        QTableWidgetItem *hdr = new QTableWidgetItem(groupName);
+        QFont f = hdr->font();
+        f.setBold(true);
+        hdr->setFont(f);
+        hdr->setFlags(Qt::ItemIsEnabled);  // not editable/selectable
+        ui->tableWidgetParts->setItem(headerRow, 0, hdr);
+
+        // Optional: make header row visually different
+        hdr->setBackground(QBrush(Qt::lightGray));
+
+        // If you want to span columns (Qt Designer must allow it):
+        // ui->tableWidgetParts->setSpan(headerRow, 0, 1, ui->tableWidgetParts->columnCount());
+
+        /*
+        // 4) Insert each part row under this header
+        for (const PartInfo &p : parts) {
+            int row = ui->tableWidgetParts->rowCount();
+            ui->tableWidgetParts->insertRow(row);
+
+            // Material Number
+            auto *matItem = new QTableWidgetItem(p.materialId);
+            ui->tableWidgetParts->setItem(row, 0, matItem);
+
+            // Item Name
+            auto *nameItem = new QTableWidgetItem(
+                p.part.isEmpty() ? "(no details)" : p.part);
+            ui->tableWidgetParts->setItem(row, 1, nameItem);
+
+            // Storage Location
+            auto *storItem = new QTableWidgetItem(p.storage);
+            ui->tableWidgetParts->setItem(row, 2, storItem);
+
+            // Quantity spinbox
+            auto *spin = new QSpinBox(ui->tableWidgetParts);
+            spin->setMinimum(0);
+            spin->setMaximum(9999);
+            spin->setValue(p.qty);
+            ui->tableWidgetParts->setCellWidget(row, 3, spin);
+
+        }
+        */
+
+        auto subHeaderText = [](int subOrder) -> QString {
+            switch (subOrder) {
+            case 1:  return "ARM A";
+            case 2:  return "ARM B";
+            case 3:  return "DM Lika upgrade";
+            default: return QString();
+            }
+        };
+
+        int lastSubOrder = -1;
+
+        // 4) Insert each part row under this header
+        for (const PartInfo &p : parts) {
+
+            // insert sub-header when subOrder changes (and is not 0)
+            if (p.subOrder != 0 && p.subOrder != lastSubOrder) {
+                QString subText = subHeaderText(p.subOrder);
+                if (!subText.isEmpty()) {
+                    int srow = ui->tableWidgetParts->rowCount();
+                    ui->tableWidgetParts->insertRow(srow);
+
+                    QTableWidgetItem *subHdr = new QTableWidgetItem("  " + subText);
+                    QFont fs = subHdr->font();
+                    fs.setBold(true);
+                    subHdr->setFont(fs);
+                    subHdr->setFlags(Qt::ItemIsEnabled);
+                    subHdr->setBackground(QBrush(Qt::lightGray));
+                    ui->tableWidgetParts->setItem(srow, 0, subHdr);
+                }
+                lastSubOrder = p.subOrder;
+            }
+
+            int row = ui->tableWidgetParts->rowCount();
+            ui->tableWidgetParts->insertRow(row);
+
+            // Material Number
+            auto *matItem = new QTableWidgetItem(p.materialId);
+            ui->tableWidgetParts->setItem(row, 0, matItem);
+
+            // Item Name
+            auto *nameItem = new QTableWidgetItem(
+                p.part.isEmpty() ? "(no details)" : p.part);
+            ui->tableWidgetParts->setItem(row, 1, nameItem);
+
+            // Storage Location
+            auto *storItem = new QTableWidgetItem(p.storage);
+            ui->tableWidgetParts->setItem(row, 2, storItem);
+
+            // Quantity spinbox
+            auto *spin = new QSpinBox(ui->tableWidgetParts);
+            spin->setMinimum(0);
+            spin->setMaximum(9999);
+            spin->setValue(p.qty);
+            ui->tableWidgetParts->setCellWidget(row, 3, spin);
+        }
+
+    }
+
+
+    ui->tableWidgetParts->resizeColumnToContents(0); // Material Number
+    ui->tableWidgetParts->resizeColumnToContents(1); // Item Name
 }
 
 
@@ -973,6 +1009,46 @@ AutoPurchase::PartInfo lookupInventory(const QVariantList &rowsMat,
     return info;
 }
 
+struct InvLookupResult {
+    QString name;
+    QString storage;
+    bool    found = false;
+};
+
+static InvLookupResult findInInventory(const QVariantList &rowsMat,
+                                       const QString &id)
+{
+    InvLookupResult res;
+    if (rowsMat.isEmpty() || id.isEmpty())
+        return res;
+
+    // ⚠️ Use the SAME column indices that already work
+    // for your normal inventory-based parts.
+    const int MATERIAL_ID_COL = 1;  // e.g. A
+    const int NAME_COL        = 5;  // e.g. C
+    const int STORAGE_COL     = 3;  // e.g. G
+
+    auto getCol = [&](int r, int c) -> QString {
+        if (r < 0 || r >= rowsMat.size()) return "";
+        QVariantList cols = rowsMat[r].toList();
+        if (c < 0 || c >= cols.size()) return "";
+        return cols[c].toString().trimmed();
+    };
+
+    for (int r = 0; r < rowsMat.size(); ++r) {
+        QString matId = getCol(r, MATERIAL_ID_COL);
+        if (matId.compare(id, Qt::CaseInsensitive) == 0) {
+            res.name    = getCol(r, NAME_COL);
+            res.storage = getCol(r, STORAGE_COL);
+            res.found   = true;
+            break;
+        }
+    }
+
+    return res;
+}
+
+
 
 QList<AutoPurchase::PartInfo>
 AutoPurchase::findArmUpgradeParts(bool sideA) const
@@ -988,15 +1064,23 @@ AutoPurchase::findArmUpgradeParts(bool sideA) const
         return cols[c].toString().trimmed();
     };
 
-    int colId = sideA ? 3 : 1;      // A=0, B=1, C=2, D=3, E=4 → IDs in A and D
-    int colQL = sideA ? 4 : 2;      // B or E = "<qty> <location>"
+    int colId = sideA ? 4 : 0;      // A=0, B=1, C=2, D=3, E=4 → IDs in A and D
+    int colQL = sideA ? 5 : 1;      // B or E = "<qty> <location>"
+    int storageLoc = sideA ? 6 : 2;
 
-    for (int r = 0; r < m_rowsArmUpgrade.size(); ++r) {
+    for (int r = 1; r < m_rowsArmUpgrade.size(); ++r) {
         QString id = getCol(r, colId);
         if (id.isEmpty())
             continue;
 
         QString qloc = getCol(r, colQL);   // e.g. "2 02-06B"
+        QString qstorageloc = getCol(r, storageLoc);
+
+        int qty = 1;
+        bool ok = false;
+        int q = qloc.toInt(&ok);
+        if (ok && q > 0){ qty = q; }
+        /*
         int qty = 1;
         QString loc;
 
@@ -1009,8 +1093,28 @@ AutoPurchase::findArmUpgradeParts(bool sideA) const
                 if (parts.size() > 1) loc = parts[1];
             }
         }
+        */
 
-        PartInfo info = lookupInventory(m_rowsMaterials, id, qty, loc);
+        //PartInfo info = lookupInventory(m_rowsMaterials, id, qty, loc);
+        //PartInfo info = lookupInventory(m_rowsMaterials, id, qty, qstorageloc);
+
+        PartInfo info;
+        info.materialId = id;
+        info.qty        = qty;
+        info.storage    = qstorageloc;   // may be empty
+        info.found      = false; // will mark true if inv or ARM has something
+        // name from ARM sheet? (if you ever add it)
+        // info.part = ...;
+
+        // Fallback to inventory if name or location is missing
+        InvLookupResult inv = findInInventory(m_rowsMaterials, id);
+        if (info.part.isEmpty() && inv.found)
+            info.part = inv.name;
+        if (info.storage.isEmpty() && inv.found)
+            info.storage = inv.storage;
+
+        info.found = inv.found || !info.part.isEmpty() || !info.storage.isEmpty();
+
         result.append(info);
     }
 
@@ -1032,14 +1136,14 @@ AutoPurchase::findDmUpgradeParts() const
         return cols[c].toString().trimmed();
     };
 
-    for (int r = 0; r < m_rowsDmUpgrade.size(); ++r) {
+    for (int r = 2; r < m_rowsDmUpgrade.size(); ++r) {
         QString id    = getCol(r, 0);   // product number
         if (id.isEmpty())
             continue;
 
-        QString name  = getCol(r, 2);   // item name
-        QString qtyStr= getCol(r, 3);   // quantity
-        QString loc   = getCol(r, 6);   // storage location
+        QString name  = getCol(r, 1);   // item name
+        QString qtyStr= getCol(r, 2);   // quantity
+        QString loc   = getCol(r, 4);   // storage location
 
         int qty = 1;
         bool ok = false;
@@ -1052,6 +1156,13 @@ AutoPurchase::findDmUpgradeParts() const
         info.storage    = loc;
         info.qty        = qty;
         info.found      = true;
+
+        // Fallback to inventory if DM row misses name or location
+        InvLookupResult inv = findInInventory(m_rowsMaterials, id);
+        if (info.part.isEmpty() && inv.found)
+            info.part = inv.name;
+        if (info.storage.isEmpty() && inv.found)
+            info.storage = inv.storage;
 
         result.append(info);
     }
