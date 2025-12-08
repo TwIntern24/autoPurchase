@@ -169,6 +169,40 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
         //ui->tableWidgetParts->horizontalHeader()
           //  ->setSectionResizeMode(QHeaderView::ResizeToContents);
 
+        // requester combo
+           connect(ui->comboRequester,
+                   QOverload<int>::of(&QComboBox::currentIndexChanged),
+                   this,
+                   &AutoPurchase::onRequesterChanged);
+
+           loadRequesters();
+
+           // default date for request
+           ui->dateEditRequest->setDate(QDate::currentDate());
+
+           connect(ui->btnLoadJob, &QPushButton::clicked,
+                   this, &AutoPurchase::onLoadJobFile);
+
+
+
+           m_jobThread = new QThread(this);
+           m_jobLoader = new ExcelLoader();
+           m_jobLoader->moveToThread(m_jobThread);
+
+           connect(m_jobThread, &QThread::finished,
+                   m_jobLoader, &QObject::deleteLater);
+
+           connect(this, &AutoPurchase::startJobFileLoad,
+                   m_jobLoader, &ExcelLoader::loadFile);
+
+           connect(m_jobLoader, &ExcelLoader::loaded,
+                   this, &AutoPurchase::onJobFileLoaded);
+
+           connect(m_jobLoader, &ExcelLoader::loadFailed,
+                   this, &AutoPurchase::onJobFileLoadFailed);
+
+           m_jobThread->start();
+
 }
 
 AutoPurchase::~AutoPurchase()
@@ -189,6 +223,10 @@ AutoPurchase::~AutoPurchase()
         m_dmThread->quit();
         m_dmThread->wait();
     }
+    if (m_jobThread) {
+           m_jobThread->quit();
+           m_jobThread->wait();
+       }
     delete ui;
 }
 
@@ -559,11 +597,12 @@ AutoPurchase::findPartsForMaterial(const QString &expr) const
     return result;
 }
 
-
-
-void AutoPurchase::onChecklistItemChanged(QListWidgetItem * /*item*/)
+//void AutoPurchase::onChecklistItemChanged(QListWidgetItem * /*item*/)
+/*
+void AutoPurchase::onChecklistItemChanged(QListWidgetItem *)
 {
-    /*
+    */
+/*
     // just schedule rebuild once; UI can update immediately
     if (m_rebuildPending)
         return;
@@ -571,18 +610,21 @@ void AutoPurchase::onChecklistItemChanged(QListWidgetItem * /*item*/)
     m_rebuildPending = true;
     QTimer::singleShot(50, this, &AutoPurchase::rebuildPartsFromChecklist);
     */
+/*
     rebuildPartsFromChecklist();
 }
+*/
 
-/*
-void AutoPurchase::rebuildPartsFromChecklist()
+void AutoPurchase::onChecklistItemChanged(QListWidgetItem *item)
 {
-    //m_rebuildPending = false;
+    if (!item)
+        return;
 
-    ui->tableWidgetParts->setUpdatesEnabled(false);
-    ui->tableWidgetParts->setRowCount(0);
+    // Debug: see what state the changed item has
+    // qDebug() << "itemChanged:" << item->text() << "state:" << item->checkState();
 
-    // 0) If no checklist item is checked, just clear & hide the table
+    // If this item has just become unchecked, check if any other items are still checked
+    if (item->checkState() == Qt::Unchecked) {
         bool anyChecked = false;
         for (int i = 0; i < ui->listWidgetChecklist->count(); ++i) {
             QListWidgetItem *it = ui->listWidgetChecklist->item(i);
@@ -592,110 +634,21 @@ void AutoPurchase::rebuildPartsFromChecklist()
             }
         }
 
+        // If nothing is checked anymore → hard clear + hide table and stop
         if (!anyChecked) {
-            //ui->tableWidgetParts->setRowCount(0);
+            // qDebug() << "No checklist items checked → hiding table";
+            ui->tableWidgetParts->setRowCount(0);
             ui->tableWidgetParts->hide();
-            ui->tableWidgetParts->setUpdatesEnabled(true);
             return;
         }
-
-
-
-    if (m_rowsMaterials.isEmpty()) {
-        ui->tableWidgetParts->hide();
-        ui->tableWidgetParts->setUpdatesEnabled(true);
-        return;
     }
 
-    QList<PartInfo> allParts;
-
-    for (int i = 0; i < ui->listWidgetChecklist->count(); ++i) {
-        QListWidgetItem *it = ui->listWidgetChecklist->item(i);
-        if (it->checkState() != Qt::Checked)
-            continue;
-
-        QString expr = it->data(Qt::UserRole).toString().trimmed();
-        QString checklistLabel = it->text();
-        if (expr.isEmpty()){
-            PartInfo p;
-                        //p.materialId    = "-";              // no ID
-                        p.materialId.clear();
-                        p.part          = QString("No material ID for: %1").arg(checklistLabel);  // show the checklist text
-                        p.storage       = "-";
-                        p.qty           = 0;
-                        p.found         = false;
-                        p.checklistName = checklistLabel;
-                        p.subOrder      = 99;               // normal group
-                        allParts.append(p);
-            continue;
-        }
-
-
-
-        //QString checklistLabel = it->text();
-        QString e = expr.toLower().remove(' ').remove('-');  // robust match
-
-        QList<PartInfo> parts;
-
-        /*
-        if (e.contains("arma")) {
-            parts = findArmUpgradeParts(true);
-        } else if (e.contains("armb")) {
-            parts = findArmUpgradeParts(false);
-        } else if (e.contains("dmlika")) {
-            parts = findDmUpgradeParts();
-        } else {
-            parts = findPartsForMaterial(expr);
-        }
-
-        for (PartInfo &p : parts) {
-            p.checklistName = checklistLabel;
-        }
-*/
-/*
-        if (e.contains("arma")) {
-                    parts = findArmUpgradeParts(true);
-                    for (PartInfo &p : parts) {
-                        p.checklistName = checklistLabel;
-                        p.subOrder      = 1;   // ARM A
-                    }
-                } else if (e.contains("armb")) {
-                    parts = findArmUpgradeParts(false);
-                    for (PartInfo &p : parts) {
-                        p.checklistName = checklistLabel;
-                        p.subOrder      = 2;   // ARM B
-                    }
-                } else if (e.contains("dmlika")) {
-                    parts = findDmUpgradeParts();
-                    for (PartInfo &p : parts) {
-                        p.checklistName = checklistLabel;
-                        p.subOrder      = 3;   // DM Lika
-                    }
-                } else {
-                    parts = findPartsForMaterial(expr);
-                    for (PartInfo &p : parts) {
-                        p.checklistName = checklistLabel;
-                        p.subOrder      = 0;   // normal checklist parts
-                    }
-                }
-
-
-        allParts.append(parts);
-    }
-
-    if (!allParts.isEmpty()) {
-        rebuildPartsTable(allParts);
-        ui->tableWidgetParts->show();
-    } else {
-        ui->tableWidgetParts->hide();
-    }
-
-    ui->tableWidgetParts->resizeColumnToContents(0);
-    ui->tableWidgetParts->resizeColumnToContents(1); // only item-name col
-    ui->tableWidgetParts->setUpdatesEnabled(true);
+    // Otherwise, rebuild normally
+    rebuildPartsFromChecklist();
 }
-*/
 
+
+/*
 void AutoPurchase::rebuildPartsFromChecklist()
 {
     ui->tableWidgetParts->setUpdatesEnabled(false);
@@ -769,6 +722,111 @@ void AutoPurchase::rebuildPartsFromChecklist()
         rebuildPartsTable(allParts);
         ui->tableWidgetParts->show();
     } else {
+        ui->tableWidgetParts->hide();
+    }
+
+    ui->tableWidgetParts->resizeColumnToContents(0);
+    ui->tableWidgetParts->resizeColumnToContents(1);
+    ui->tableWidgetParts->setUpdatesEnabled(true);
+}
+*/
+
+void AutoPurchase::rebuildPartsFromChecklist()
+{
+    ui->tableWidgetParts->setUpdatesEnabled(false);
+    ui->tableWidgetParts->setRowCount(0);
+
+    if (m_rowsMaterials.isEmpty()) {
+        ui->tableWidgetParts->hide();
+        ui->tableWidgetParts->setUpdatesEnabled(true);
+        return;
+    }
+
+    // 1) Collect all checked checklist items first
+    QVector<QListWidgetItem*> checkedItems;
+    checkedItems.reserve(ui->listWidgetChecklist->count());
+
+    for (int i = 0; i < ui->listWidgetChecklist->count(); ++i) {
+        QListWidgetItem *it = ui->listWidgetChecklist->item(i);
+        if (it->checkState() == Qt::Checked)
+            checkedItems.push_back(it);
+    }
+
+    // 2) If nothing is checked → clear + hide table and return
+    if (checkedItems.isEmpty()) {
+        ui->tableWidgetParts->setRowCount(0);
+        ui->tableWidgetParts->hide();
+        ui->tableWidgetParts->setUpdatesEnabled(true);
+        return;
+    }
+
+    // 3) Build parts only from the checked items
+    QList<PartInfo> allParts;
+
+    for (QListWidgetItem *it : checkedItems) {
+        QString expr           = it->data(Qt::UserRole).toString().trimmed();
+        QString checklistLabel = it->text();
+
+        // ---- case: no material ID for this checklist item ----
+        if (expr.isEmpty()) {
+            PartInfo p;
+            p.materialId.clear();   // no ID → sorted to bottom in comparator
+            p.part          = QString("No material ID for: %1").arg(checklistLabel);
+            p.storage       = "-";
+            p.qty           = 0;
+            p.found         = false;
+            p.checklistName = checklistLabel;
+            p.subOrder      = 99;   // “after normal” in your ordering
+            allParts.append(p);
+            continue;
+        }
+
+        // ---- normal / special expressions ----
+        QString e = expr.toLower().remove(' ').remove('-');
+        QList<PartInfo> parts;
+
+        if (e.contains("arma")) {
+            parts = findArmUpgradeParts(true);
+            for (PartInfo &p : parts) {
+                p.checklistName = checklistLabel;
+                p.subOrder      = 1;   // ARM A
+            }
+        } else if (e.contains("armb")) {
+            parts = findArmUpgradeParts(false);
+            for (PartInfo &p : parts) {
+                p.checklistName = checklistLabel;
+                p.subOrder      = 2;   // ARM B
+            }
+        } else if (e.contains("dmlika")) {
+            parts = findDmUpgradeParts();
+            for (PartInfo &p : parts) {
+                p.checklistName = checklistLabel;
+                p.subOrder      = 3;   // DM Lika
+            }
+        } else {
+            parts = findPartsForMaterial(expr);
+            for (PartInfo &p : parts) {
+                p.checklistName = checklistLabel;
+                p.subOrder      = 0;   // normal checklist parts
+            }
+        }
+
+        int multiplier = it->data(Qt::UserRole + 1).toInt();
+               if (multiplier > 1) {
+                   for (PartInfo &p : parts) {
+                       p.qty *= multiplier;
+                   }
+               }
+
+        allParts.append(parts);
+    }
+
+    // 4) Show/hide based on allParts
+    if (!allParts.isEmpty()) {
+        rebuildPartsTable(allParts);
+        ui->tableWidgetParts->show();
+    } else {
+        // (This would only happen if checked items all somehow produced no parts)
         ui->tableWidgetParts->hide();
     }
 
@@ -1168,4 +1226,203 @@ AutoPurchase::findDmUpgradeParts() const
     }
 
     return result;
+}
+
+
+void AutoPurchase::loadRequesters()
+{
+    QString base = QCoreApplication::applicationDirPath();
+    QString path = base + "/../data/requesters.txt";
+
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Failed to open requester list:" << path << file.errorString();
+        return;
+    }
+
+    QTextStream in(&file);
+    // in.setCodec("UTF-8"); // if needed
+
+    ui->comboRequester->clear();
+    ui->comboRequester->addItem("Select requester"); // index 0 = placeholder
+
+    m_requesters.clear();
+
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+        if (line.isEmpty() || line.startsWith('#'))
+            continue;
+
+        QStringList parts = line.split(';');
+        if (parts.size() < 2)
+            continue;   // need at least name + email
+
+        RequesterInfo info;
+        info.name  = parts.value(0).trimmed();
+        info.email = parts.value(1).trimmed();
+        info.id    = parts.value(2).trimmed();  // may be empty
+
+        m_requesters.push_back(info);
+
+        int idx = ui->comboRequester->count();
+        ui->comboRequester->addItem(info.name);
+        ui->comboRequester->setItemData(idx, info.email, Qt::UserRole);
+        ui->comboRequester->setItemData(idx, info.id,    Qt::UserRole + 1);
+    }
+
+    file.close();
+}
+
+
+void AutoPurchase::onRequesterChanged(int index)
+{
+    if (index <= 0)
+        return;
+
+    QString email = ui->comboRequester->itemData(index, Qt::UserRole).toString();
+    QString id    = ui->comboRequester->itemData(index, Qt::UserRole + 1).toString();
+
+    qDebug() << "Requester email:" << email;
+    qDebug() << "Requester ID:" << id;
+
+    // If you have fields:
+    // ui->lineRequesterEmail->setText(email);
+    // ui->lineRequesterId->setText(id);
+}
+
+
+// ============================
+//  JOB EXCEL: load + robots
+// ============================
+
+void AutoPurchase::onLoadJobFile()
+{
+    QString path = QFileDialog::getOpenFileName(
+                this,
+                tr("Open job Excel"),
+                QString(),
+                tr("Excel files (*.xlsx *.xls)"));
+
+    if (path.isEmpty())
+        return;
+
+    ui->labelStatus->setText("Loading job Excel...");
+    emit startJobFileLoad(path);
+
+    // Infer robot name from file name
+    QString lower = QFileInfo(path).fileName().toLower();
+
+    if (lower.contains("mk5")) {
+        m_jobRobotFromFile = "MK5";
+    } else if (lower.contains("doublefold") || lower.contains("df")) {
+        m_jobRobotFromFile = "Double Fold";
+    } else {
+        m_jobRobotFromFile.clear(); // unknown / not used
+    }
+
+    qDebug() << "Robot from job file name:" << m_jobRobotFromFile;
+}
+
+void AutoPurchase::onJobFileLoaded(const QVariantList &rows)
+{
+    m_rowsJob = rows;
+    ui->labelStatus->setText("Job file loaded");
+
+    // Detect header row + columns once
+    detectJobColumns();
+
+    // Apply file to checklist automatically
+    applyJobToChecklist();
+}
+
+
+void AutoPurchase::onJobFileLoadFailed(const QString &error)
+{
+    ui->labelStatus->setText("Job file load error: " + error);
+}
+
+void AutoPurchase::applyJobToChecklist()
+{
+    if (m_rowsJob.isEmpty())
+        return;
+
+    if (m_jobColChecklist < 0 || m_jobColNeed < 0) {
+        qDebug() << "Job file: checklist or need column not found!";
+        return;
+    }
+
+    // 0) Clear all checks and multipliers first
+    for (int i = 0; i < ui->listWidgetChecklist->count(); ++i) {
+        QListWidgetItem *it = ui->listWidgetChecklist->item(i);
+        it->setCheckState(Qt::Unchecked);
+        it->setData(Qt::UserRole + 1, QVariant());
+    }
+
+    // helper to read cell
+    auto getJobCol = [&](int r, int c) -> QString {
+        if (r < 0 || r >= m_rowsJob.size()) return QString();
+        QVariantList cols = m_rowsJob[r].toList();
+        if (c < 0 || c >= cols.size()) return QString();
+        return cols[c].toString().trimmed();
+    };
+
+    // 1) Loop over job rows (skip header)
+    for (int r = m_jobHeaderRow + 1; r < m_rowsJob.size(); ++r) {
+        QString jobChecklist = getJobCol(r, m_jobColChecklist);
+        QString needStr      = getJobCol(r, m_jobColNeed);
+
+        if (jobChecklist.isEmpty())
+            continue;
+
+        bool ok = false;
+        int needQty = needStr.toInt(&ok);
+        if (!ok || needQty <= 0)
+            continue;   // if no valid need value, skip
+
+        // 2) Find the matching checklist item and mark it
+        for (int i = 0; i < ui->listWidgetChecklist->count(); ++i) {
+            QListWidgetItem *it = ui->listWidgetChecklist->item(i);
+            QString label = it->text();
+
+            // simple contains-match; change to == if you want exact match
+            if (label.contains(jobChecklist, Qt::CaseInsensitive)) {
+                it->setCheckState(Qt::Checked);
+                it->setData(Qt::UserRole + 1, needQty);  // multiplier
+            }
+        }
+    }
+
+    // 3) Now rebuild the parts table with these auto-checked items
+    rebuildPartsFromChecklist();
+}
+
+
+void AutoPurchase::detectJobColumns()
+{
+    m_jobHeaderRow    = 0;
+    m_jobColRobot     = -1;
+    m_jobColChecklist = -1;
+    m_jobColNeed      = -1;
+
+    if (m_rowsJob.isEmpty())
+        return;
+
+    QVariantList headerRow = m_rowsJob[m_jobHeaderRow].toList();
+
+    for (int c = 0; c < headerRow.size(); ++c) {
+        QString h = headerRow[c].toString().trimmed().toLower();
+
+        if (h.contains("robot") || h.contains("tool")) {
+            m_jobColRobot = c;
+        } else if (h.contains("checklist") || h.contains("item")) {
+            m_jobColChecklist = c;
+        } else if (h.contains("need") || h.contains("qty") || h.contains("quantity")) {
+            m_jobColNeed = c;
+        }
+    }
+
+    qDebug() << "Job header detected:"
+             << "robot col =" << m_jobColRobot
+             << "checklist col =" << m_jobColChecklist
+             << "need col =" << m_jobColNeed;
 }

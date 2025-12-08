@@ -13,10 +13,17 @@
 #include "excelloader.h"
 
 namespace Ui {
+class ExcelLoader;
 class AutoPurchase;
 }
 
 class QListWidgetItem;
+
+struct RequesterInfo {
+    QString name;
+    QString email;
+    QString id;
+};
 
 class AutoPurchase : public QMainWindow
 {
@@ -43,7 +50,9 @@ signals:
     void startExcelLoad(const QString &path);   // to worker
     void startMaterialsLoad(const QString &path);
     void startArmUpgradeLoad(const QString &path);   // ARM A/B upgrade file
-        void startDmUpgradeLoad(const QString &path);
+    void startDmUpgradeLoad(const QString &path);
+
+    void startJobFileLoad(const QString &path);
 
 private slots:
     // Slot for checklist item changed (when user ticks/unticks)
@@ -64,6 +73,13 @@ private slots:
     void onArmUpgradeLoadFailed(const QString &error);
     void onDmUpgradeLoaded(const QVariantList &rows);
     void onDmUpgradeLoadFailed(const QString &error);
+
+    void onRequesterChanged(int index);
+
+    void onLoadJobFile();                               // browse job xlsx
+    void onJobFileLoaded(const QVariantList &rows);     // job rows ready
+    void onJobFileLoadFailed(const QString &error);     // job load failed
+    //void onRobotSelected(int index);                    // robot combo changed
 
 
 private:
@@ -103,6 +119,25 @@ private:
     QList<PartInfo> findDmUpgradeParts() const;
 
     void rebuildPartsTable(const QList<PartInfo> &allParts);
+
+    QVector<RequesterInfo> m_requesters;
+    void loadRequesters();
+
+    QThread      *m_jobThread = nullptr;   // thread for job Excel
+    ExcelLoader  *m_jobLoader = nullptr;   // loader for job Excel
+    QVariantList m_rowsJob;      // rows from the automatic job Excel
+    //void applyJobFromRows();     // apply Need column → checklist
+
+    void populateRobotDropdown();   // fill comboRobotName from m_rowsJob
+    void applyJobToChecklist();     // auto-check checklist + multipliers
+
+    int m_jobHeaderRow      = 0;   // which row has headers (usually 0)
+    int m_jobColRobot       = -1;  // if you later want a robot column
+    int m_jobColChecklist   = -1;  // column for checklist label
+    int m_jobColNeed        = -1;  // column for "Need"
+    QString m_jobRobotFromFile;    // robot name inferred from file name
+
+    void detectJobColumns();
 };
 
 #endif // AUTOPURCHASE_H
