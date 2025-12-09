@@ -81,6 +81,12 @@ private slots:
     void onJobFileLoadFailed(const QString &error);     // job load failed
     //void onRobotSelected(int index);                    // robot combo changed
 
+    void on_btnSearchMaterial_clicked();
+
+    void on_btnSubmit_clicked();
+
+    void on_btnClear_clicked();
+
 
 private:
     Ui::AutoPurchase *ui;
@@ -128,16 +134,27 @@ private:
     QVariantList m_rowsJob;      // rows from the automatic job Excel
     //void applyJobFromRows();     // apply Need column → checklist
 
-    void populateRobotDropdown();   // fill comboRobotName from m_rowsJob
+    //void populateRobotDropdown();   // fill c from m_rowsJob
     void applyJobToChecklist();     // auto-check checklist + multipliers
 
     int m_jobHeaderRow      = 0;   // which row has headers (usually 0)
-    int m_jobColRobot       = -1;  // if you later want a robot column
-    int m_jobColChecklist   = -1;  // column for checklist label
+    //int m_jobColRobot       = -1;  // if you later want a robot column
+    //int m_jobColChecklist   = -1;  // column for checklist label
     int m_jobColNeed        = -1;  // column for "Need"
+    int m_jobColModule = -1;
     QString m_jobRobotFromFile;    // robot name inferred from file name
 
+    bool m_jobReady       = false;   // job Excel loaded and columns detected
+    bool m_checklistReady = false;   // robot matrix checklist built
+    bool m_jobAppliedOnce = false;   // job auto-applied once
+
+    void tryApplyJobToChecklist();
+
     void detectJobColumns();
+
+    void updateSubmitEnabled();
+
+    QList<PartInfo> m_manualParts;
 };
 
 #endif // AUTOPURCHASE_H

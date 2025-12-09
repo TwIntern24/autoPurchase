@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_AutoPurchase_t {
-    QByteArrayData data[28];
-    char stringdata0[444];
+    QByteArrayData data[31];
+    char stringdata0[514];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -58,7 +58,10 @@ QT_MOC_LITERAL(23, 353, 21), // "onDmUpgradeLoadFailed"
 QT_MOC_LITERAL(24, 375, 18), // "onRequesterChanged"
 QT_MOC_LITERAL(25, 394, 13), // "onLoadJobFile"
 QT_MOC_LITERAL(26, 408, 15), // "onJobFileLoaded"
-QT_MOC_LITERAL(27, 424, 19) // "onJobFileLoadFailed"
+QT_MOC_LITERAL(27, 424, 19), // "onJobFileLoadFailed"
+QT_MOC_LITERAL(28, 444, 28), // "on_btnSearchMaterial_clicked"
+QT_MOC_LITERAL(29, 473, 20), // "on_btnSubmit_clicked"
+QT_MOC_LITERAL(30, 494, 19) // "on_btnClear_clicked"
 
     },
     "AutoPurchase\0startExcelLoad\0\0path\0"
@@ -72,7 +75,9 @@ QT_MOC_LITERAL(27, 424, 19) // "onJobFileLoadFailed"
     "onArmUpgradeLoaded\0onArmUpgradeLoadFailed\0"
     "onDmUpgradeLoaded\0onDmUpgradeLoadFailed\0"
     "onRequesterChanged\0onLoadJobFile\0"
-    "onJobFileLoaded\0onJobFileLoadFailed"
+    "onJobFileLoaded\0onJobFileLoadFailed\0"
+    "on_btnSearchMaterial_clicked\0"
+    "on_btnSubmit_clicked\0on_btnClear_clicked"
 };
 #undef QT_MOC_LITERAL
 
@@ -82,7 +87,7 @@ static const uint qt_meta_data_AutoPurchase[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      20,   14, // methods
+      23,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -90,28 +95,31 @@ static const uint qt_meta_data_AutoPurchase[] = {
        5,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,  114,    2, 0x06 /* Public */,
-       4,    1,  117,    2, 0x06 /* Public */,
-       5,    1,  120,    2, 0x06 /* Public */,
-       6,    1,  123,    2, 0x06 /* Public */,
-       7,    1,  126,    2, 0x06 /* Public */,
+       1,    1,  129,    2, 0x06 /* Public */,
+       4,    1,  132,    2, 0x06 /* Public */,
+       5,    1,  135,    2, 0x06 /* Public */,
+       6,    1,  138,    2, 0x06 /* Public */,
+       7,    1,  141,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       8,    1,  129,    2, 0x08 /* Private */,
-      10,    1,  132,    2, 0x08 /* Private */,
-      12,    1,  135,    2, 0x08 /* Private */,
-      14,    1,  138,    2, 0x08 /* Private */,
-      15,    1,  141,    2, 0x08 /* Private */,
-      16,    1,  144,    2, 0x08 /* Private */,
-      19,    0,  147,    2, 0x08 /* Private */,
-      20,    1,  148,    2, 0x08 /* Private */,
-      21,    1,  151,    2, 0x08 /* Private */,
-      22,    1,  154,    2, 0x08 /* Private */,
-      23,    1,  157,    2, 0x08 /* Private */,
-      24,    1,  160,    2, 0x08 /* Private */,
-      25,    0,  163,    2, 0x08 /* Private */,
-      26,    1,  164,    2, 0x08 /* Private */,
-      27,    1,  167,    2, 0x08 /* Private */,
+       8,    1,  144,    2, 0x08 /* Private */,
+      10,    1,  147,    2, 0x08 /* Private */,
+      12,    1,  150,    2, 0x08 /* Private */,
+      14,    1,  153,    2, 0x08 /* Private */,
+      15,    1,  156,    2, 0x08 /* Private */,
+      16,    1,  159,    2, 0x08 /* Private */,
+      19,    0,  162,    2, 0x08 /* Private */,
+      20,    1,  163,    2, 0x08 /* Private */,
+      21,    1,  166,    2, 0x08 /* Private */,
+      22,    1,  169,    2, 0x08 /* Private */,
+      23,    1,  172,    2, 0x08 /* Private */,
+      24,    1,  175,    2, 0x08 /* Private */,
+      25,    0,  178,    2, 0x08 /* Private */,
+      26,    1,  179,    2, 0x08 /* Private */,
+      27,    1,  182,    2, 0x08 /* Private */,
+      28,    0,  185,    2, 0x08 /* Private */,
+      29,    0,  186,    2, 0x08 /* Private */,
+      30,    0,  187,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QString,    3,
@@ -136,6 +144,9 @@ static const uint qt_meta_data_AutoPurchase[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::QVariantList,   11,
     QMetaType::Void, QMetaType::QString,   13,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
 
        0        // eod
 };
@@ -166,6 +177,9 @@ void AutoPurchase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         case 17: _t->onLoadJobFile(); break;
         case 18: _t->onJobFileLoaded((*reinterpret_cast< const QVariantList(*)>(_a[1]))); break;
         case 19: _t->onJobFileLoadFailed((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 20: _t->on_btnSearchMaterial_clicked(); break;
+        case 21: _t->on_btnSubmit_clicked(); break;
+        case 22: _t->on_btnClear_clicked(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -234,13 +248,13 @@ int AutoPurchase::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 20)
+        if (_id < 23)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 20;
+        _id -= 23;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 20)
+        if (_id < 23)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 20;
+        _id -= 23;
     }
     return _id;
 }

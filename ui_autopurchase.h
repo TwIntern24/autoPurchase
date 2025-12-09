@@ -17,9 +17,9 @@
 #include <QtWidgets/QDateEdit>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTableWidget>
@@ -40,8 +40,12 @@ public:
     QComboBox *comboRequester;
     QDateEdit *dateEditRequest;
     QPushButton *btnLoadJob;
-    QComboBox *comboRobotName;
-    QMenuBar *menuBar;
+    QLineEdit *lineSearchMaterial;
+    QPushButton *btnSearchMaterial;
+    QLabel *labelSearchResult;
+    QPushButton *btnClearManual;
+    QPushButton *btnSubmit;
+    QPushButton *btnClear;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -77,14 +81,25 @@ public:
         btnLoadJob = new QPushButton(centralWidget);
         btnLoadJob->setObjectName(QStringLiteral("btnLoadJob"));
         btnLoadJob->setGeometry(QRect(360, 80, 161, 23));
-        comboRobotName = new QComboBox(centralWidget);
-        comboRobotName->setObjectName(QStringLiteral("comboRobotName"));
-        comboRobotName->setGeometry(QRect(610, 90, 121, 22));
+        lineSearchMaterial = new QLineEdit(centralWidget);
+        lineSearchMaterial->setObjectName(QStringLiteral("lineSearchMaterial"));
+        lineSearchMaterial->setGeometry(QRect(560, 70, 111, 20));
+        btnSearchMaterial = new QPushButton(centralWidget);
+        btnSearchMaterial->setObjectName(QStringLiteral("btnSearchMaterial"));
+        btnSearchMaterial->setGeometry(QRect(700, 70, 75, 23));
+        labelSearchResult = new QLabel(centralWidget);
+        labelSearchResult->setObjectName(QStringLiteral("labelSearchResult"));
+        labelSearchResult->setGeometry(QRect(580, 91, 81, 21));
+        btnClearManual = new QPushButton(centralWidget);
+        btnClearManual->setObjectName(QStringLiteral("btnClearManual"));
+        btnClearManual->setGeometry(QRect(690, 100, 141, 23));
+        btnSubmit = new QPushButton(centralWidget);
+        btnSubmit->setObjectName(QStringLiteral("btnSubmit"));
+        btnSubmit->setGeometry(QRect(410, 730, 75, 23));
+        btnClear = new QPushButton(centralWidget);
+        btnClear->setObjectName(QStringLiteral("btnClear"));
+        btnClear->setGeometry(QRect(810, 400, 75, 23));
         AutoPurchase->setCentralWidget(centralWidget);
-        menuBar = new QMenuBar(AutoPurchase);
-        menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1153, 21));
-        AutoPurchase->setMenuBar(menuBar);
         mainToolBar = new QToolBar(AutoPurchase);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
         AutoPurchase->addToolBar(Qt::TopToolBarArea, mainToolBar);
@@ -104,6 +119,12 @@ public:
         labelLoading->setText(QApplication::translate("AutoPurchase", "l", Q_NULLPTR));
         labelStatus->setText(QString());
         btnLoadJob->setText(QApplication::translate("AutoPurchase", "Automatic Robot Parts Select", Q_NULLPTR));
+        lineSearchMaterial->setPlaceholderText(QApplication::translate("AutoPurchase", "Enter Material Id", Q_NULLPTR));
+        btnSearchMaterial->setText(QApplication::translate("AutoPurchase", "Search", Q_NULLPTR));
+        labelSearchResult->setText(QString());
+        btnClearManual->setText(QApplication::translate("AutoPurchase", "Clear Manual search items", Q_NULLPTR));
+        btnSubmit->setText(QApplication::translate("AutoPurchase", "Submit", Q_NULLPTR));
+        btnClear->setText(QApplication::translate("AutoPurchase", "All Clear", Q_NULLPTR));
     } // retranslateUi
 
 };
