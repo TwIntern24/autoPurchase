@@ -155,6 +155,8 @@ private:
     void updateSubmitEnabled();
 
     QList<PartInfo> m_manualParts;
+
+    void on_btnClearManual_clicked();
 };
 
 #endif // AUTOPURCHASE_H
