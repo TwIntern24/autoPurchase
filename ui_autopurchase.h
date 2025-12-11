@@ -80,7 +80,7 @@ public:
         dateEditRequest->setGeometry(QRect(560, 20, 110, 22));
         btnLoadJob = new QPushButton(centralWidget);
         btnLoadJob->setObjectName(QStringLiteral("btnLoadJob"));
-        btnLoadJob->setGeometry(QRect(360, 80, 161, 23));
+        btnLoadJob->setGeometry(QRect(330, 80, 191, 23));
         lineSearchMaterial = new QLineEdit(centralWidget);
         lineSearchMaterial->setObjectName(QStringLiteral("lineSearchMaterial"));
         lineSearchMaterial->setGeometry(QRect(560, 70, 111, 20));

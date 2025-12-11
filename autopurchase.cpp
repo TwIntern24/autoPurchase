@@ -355,19 +355,6 @@ void AutoPurchase::buildChecklistFromExcelRows(const QVariantList &rows)
     enum Sec { None, Arm, DM, ZM, ArmAfter3or5year, DMAfter3or5year, ZMAfter5year };
     Sec current = None;
 
-    /*
-    for (int r = 0; r < rows.size() && r < 80; ++r) {
-        QVariantList cols = rows[r].toList();
-        qDebug() << "Row" << (r + 1);
-        for (int c = 0; c < cols.size(); ++c) {
-            QString v = cols[c].toString().trimmed();
-            if (!v.isEmpty()) {
-                qDebug() << "  Col" << (c + 1) << ":" << v;
-            }
-        }
-    }
-    */
-
     for (int r = 0; r < rows.size(); ++r)
     {
         // let UI update every 20 rows so the GIF animates
@@ -615,24 +602,6 @@ AutoPurchase::findPartsForMaterial(const QString &expr) const
 
     return result;
 }
-
-//void AutoPurchase::onChecklistItemChanged(QListWidgetItem * /*item*/)
-/*
-void AutoPurchase::onChecklistItemChanged(QListWidgetItem *)
-{
-    */
-/*
-    // just schedule rebuild once; UI can update immediately
-    if (m_rebuildPending)
-        return;
-
-    m_rebuildPending = true;
-    QTimer::singleShot(50, this, &AutoPurchase::rebuildPartsFromChecklist);
-    */
-/*
-    rebuildPartsFromChecklist();
-}
-*/
 
 void AutoPurchase::onChecklistItemChanged(QListWidgetItem *item)
 {
@@ -1524,9 +1493,9 @@ void AutoPurchase::onLoadJobFile()
     // Infer robot name from file name
     QString lower = QFileInfo(path).fileName().toLower();
 
-    if (lower.contains("mk5")) {
+    if (lower.contains("mk5") || lower.contains("mk6")) {
         m_jobRobotFromFile = "MK5";
-    } else if (lower.contains("doublefold") || lower.contains("df")) {
+    } else if (lower.contains("doublefold") || lower.contains("df") || lower.contains("avr")) {
         m_jobRobotFromFile = "Double Fold";
     } else {
         m_jobRobotFromFile.clear(); // unknown / not used
