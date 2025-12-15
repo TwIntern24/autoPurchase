@@ -15,15 +15,18 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDateEdit>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSplitter>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QToolBar>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -32,20 +35,29 @@ class Ui_AutoPurchase
 {
 public:
     QWidget *centralWidget;
-    QListWidget *listWidgetChecklist;
-    QComboBox *comboExcel;
     QLabel *labelLoading;
     QLabel *labelStatus;
-    QTableWidget *tableWidgetParts;
-    QComboBox *comboRequester;
-    QDateEdit *dateEditRequest;
-    QPushButton *btnLoadJob;
-    QLineEdit *lineSearchMaterial;
-    QPushButton *btnSearchMaterial;
-    QLabel *labelSearchResult;
-    QPushButton *btnClearManual;
     QPushButton *btnSubmit;
+    QWidget *widget;
+    QVBoxLayout *verticalLayout_3;
+    QComboBox *comboExcel;
+    QComboBox *comboRequester;
+    QPushButton *btnLoadJob;
+    QWidget *widget1;
+    QVBoxLayout *verticalLayout_4;
+    QDateEdit *dateEditRequest;
+    QHBoxLayout *horizontalLayout;
+    QVBoxLayout *verticalLayout_2;
+    QLineEdit *lineSearchMaterial;
+    QLabel *labelSearchResult;
+    QPushButton *btnSearchMaterial;
+    QWidget *widget2;
+    QVBoxLayout *verticalLayout;
+    QPushButton *btnClearManual;
     QPushButton *btnClear;
+    QSplitter *splitter;
+    QListWidget *listWidgetChecklist;
+    QTableWidget *tableWidgetParts;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -56,49 +68,107 @@ public:
         AutoPurchase->resize(1153, 805);
         centralWidget = new QWidget(AutoPurchase);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
-        listWidgetChecklist = new QListWidget(centralWidget);
-        listWidgetChecklist->setObjectName(QStringLiteral("listWidgetChecklist"));
-        listWidgetChecklist->setGeometry(QRect(220, 160, 481, 281));
-        comboExcel = new QComboBox(centralWidget);
-        comboExcel->setObjectName(QStringLiteral("comboExcel"));
-        comboExcel->setGeometry(QRect(370, 10, 121, 22));
         labelLoading = new QLabel(centralWidget);
         labelLoading->setObjectName(QStringLiteral("labelLoading"));
-        labelLoading->setGeometry(QRect(350, 110, 171, 41));
+        labelLoading->setGeometry(QRect(980, 195, 91, 61));
         labelLoading->setAlignment(Qt::AlignCenter);
         labelStatus = new QLabel(centralWidget);
         labelStatus->setObjectName(QStringLiteral("labelStatus"));
-        labelStatus->setGeometry(QRect(540, 120, 131, 20));
-        tableWidgetParts = new QTableWidget(centralWidget);
-        tableWidgetParts->setObjectName(QStringLiteral("tableWidgetParts"));
-        tableWidgetParts->setGeometry(QRect(180, 480, 591, 231));
-        comboRequester = new QComboBox(centralWidget);
-        comboRequester->setObjectName(QStringLiteral("comboRequester"));
-        comboRequester->setGeometry(QRect(370, 50, 131, 22));
-        dateEditRequest = new QDateEdit(centralWidget);
-        dateEditRequest->setObjectName(QStringLiteral("dateEditRequest"));
-        dateEditRequest->setGeometry(QRect(560, 20, 110, 22));
-        btnLoadJob = new QPushButton(centralWidget);
-        btnLoadJob->setObjectName(QStringLiteral("btnLoadJob"));
-        btnLoadJob->setGeometry(QRect(330, 80, 191, 23));
-        lineSearchMaterial = new QLineEdit(centralWidget);
-        lineSearchMaterial->setObjectName(QStringLiteral("lineSearchMaterial"));
-        lineSearchMaterial->setGeometry(QRect(560, 70, 111, 20));
-        btnSearchMaterial = new QPushButton(centralWidget);
-        btnSearchMaterial->setObjectName(QStringLiteral("btnSearchMaterial"));
-        btnSearchMaterial->setGeometry(QRect(700, 70, 75, 23));
-        labelSearchResult = new QLabel(centralWidget);
-        labelSearchResult->setObjectName(QStringLiteral("labelSearchResult"));
-        labelSearchResult->setGeometry(QRect(580, 91, 81, 21));
-        btnClearManual = new QPushButton(centralWidget);
-        btnClearManual->setObjectName(QStringLiteral("btnClearManual"));
-        btnClearManual->setGeometry(QRect(690, 100, 141, 23));
+        labelStatus->setGeometry(QRect(669, 110, 16, 16));
         btnSubmit = new QPushButton(centralWidget);
         btnSubmit->setObjectName(QStringLiteral("btnSubmit"));
-        btnSubmit->setGeometry(QRect(410, 730, 75, 23));
-        btnClear = new QPushButton(centralWidget);
+        btnSubmit->setGeometry(QRect(980, 130, 75, 23));
+        widget = new QWidget(centralWidget);
+        widget->setObjectName(QStringLiteral("widget"));
+        widget->setGeometry(QRect(330, 10, 150, 77));
+        verticalLayout_3 = new QVBoxLayout(widget);
+        verticalLayout_3->setSpacing(6);
+        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
+        verticalLayout_3->setContentsMargins(0, 0, 0, 0);
+        comboExcel = new QComboBox(widget);
+        comboExcel->setObjectName(QStringLiteral("comboExcel"));
+
+        verticalLayout_3->addWidget(comboExcel);
+
+        comboRequester = new QComboBox(widget);
+        comboRequester->setObjectName(QStringLiteral("comboRequester"));
+
+        verticalLayout_3->addWidget(comboRequester);
+
+        btnLoadJob = new QPushButton(widget);
+        btnLoadJob->setObjectName(QStringLiteral("btnLoadJob"));
+
+        verticalLayout_3->addWidget(btnLoadJob);
+
+        widget1 = new QWidget(centralWidget);
+        widget1->setObjectName(QStringLiteral("widget1"));
+        widget1->setGeometry(QRect(560, 20, 220, 71));
+        verticalLayout_4 = new QVBoxLayout(widget1);
+        verticalLayout_4->setSpacing(6);
+        verticalLayout_4->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
+        verticalLayout_4->setContentsMargins(0, 0, 0, 0);
+        dateEditRequest = new QDateEdit(widget1);
+        dateEditRequest->setObjectName(QStringLiteral("dateEditRequest"));
+
+        verticalLayout_4->addWidget(dateEditRequest);
+
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setSpacing(6);
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        verticalLayout_2 = new QVBoxLayout();
+        verticalLayout_2->setSpacing(6);
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        lineSearchMaterial = new QLineEdit(widget1);
+        lineSearchMaterial->setObjectName(QStringLiteral("lineSearchMaterial"));
+
+        verticalLayout_2->addWidget(lineSearchMaterial);
+
+        labelSearchResult = new QLabel(widget1);
+        labelSearchResult->setObjectName(QStringLiteral("labelSearchResult"));
+
+        verticalLayout_2->addWidget(labelSearchResult);
+
+
+        horizontalLayout->addLayout(verticalLayout_2);
+
+        btnSearchMaterial = new QPushButton(widget1);
+        btnSearchMaterial->setObjectName(QStringLiteral("btnSearchMaterial"));
+
+        horizontalLayout->addWidget(btnSearchMaterial);
+
+
+        verticalLayout_4->addLayout(horizontalLayout);
+
+        widget2 = new QWidget(centralWidget);
+        widget2->setObjectName(QStringLiteral("widget2"));
+        widget2->setGeometry(QRect(960, 270, 135, 54));
+        verticalLayout = new QVBoxLayout(widget2);
+        verticalLayout->setSpacing(6);
+        verticalLayout->setContentsMargins(11, 11, 11, 11);
+        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
+        btnClearManual = new QPushButton(widget2);
+        btnClearManual->setObjectName(QStringLiteral("btnClearManual"));
+
+        verticalLayout->addWidget(btnClearManual);
+
+        btnClear = new QPushButton(widget2);
         btnClear->setObjectName(QStringLiteral("btnClear"));
-        btnClear->setGeometry(QRect(810, 400, 75, 23));
+
+        verticalLayout->addWidget(btnClear);
+
+        splitter = new QSplitter(centralWidget);
+        splitter->setObjectName(QStringLiteral("splitter"));
+        splitter->setGeometry(QRect(100, 110, 741, 331));
+        splitter->setOrientation(Qt::Horizontal);
+        listWidgetChecklist = new QListWidget(splitter);
+        listWidgetChecklist->setObjectName(QStringLiteral("listWidgetChecklist"));
+        splitter->addWidget(listWidgetChecklist);
+        tableWidgetParts = new QTableWidget(splitter);
+        tableWidgetParts->setObjectName(QStringLiteral("tableWidgetParts"));
+        splitter->addWidget(tableWidgetParts);
         AutoPurchase->setCentralWidget(centralWidget);
         mainToolBar = new QToolBar(AutoPurchase);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -115,15 +185,15 @@ public:
     void retranslateUi(QMainWindow *AutoPurchase)
     {
         AutoPurchase->setWindowTitle(QApplication::translate("AutoPurchase", "AutoPurchase", Q_NULLPTR));
-        comboExcel->setCurrentText(QString());
         labelLoading->setText(QApplication::translate("AutoPurchase", "l", Q_NULLPTR));
         labelStatus->setText(QString());
+        btnSubmit->setText(QApplication::translate("AutoPurchase", "Submit", Q_NULLPTR));
+        comboExcel->setCurrentText(QString());
         btnLoadJob->setText(QApplication::translate("AutoPurchase", "Automatic Robot Parts Select", Q_NULLPTR));
         lineSearchMaterial->setPlaceholderText(QApplication::translate("AutoPurchase", "Enter Material Id", Q_NULLPTR));
-        btnSearchMaterial->setText(QApplication::translate("AutoPurchase", "Search", Q_NULLPTR));
         labelSearchResult->setText(QString());
+        btnSearchMaterial->setText(QApplication::translate("AutoPurchase", "Search", Q_NULLPTR));
         btnClearManual->setText(QApplication::translate("AutoPurchase", "Clear Manual search items", Q_NULLPTR));
-        btnSubmit->setText(QApplication::translate("AutoPurchase", "Submit", Q_NULLPTR));
         btnClear->setText(QApplication::translate("AutoPurchase", "All Clear", Q_NULLPTR));
     } // retranslateUi
 
