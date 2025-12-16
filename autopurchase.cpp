@@ -25,11 +25,15 @@
 
 #include <QTimer>
 
+#include <QStyleFactory>
+
 AutoPurchase::AutoPurchase(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::AutoPurchase)
 {
     ui->setupUi(this);
+
+    qDebug() << "Available styles:" << QStyleFactory::keys();
 
     m_jobReady       = false;
     m_checklistReady = false;
@@ -54,8 +58,8 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
        ui->labelLoading->setMovie(m_loadingMovie);
        ui->labelLoading->setScaledContents(true);
        //  Give the label a reasonable size so the gif is visible
-       ui->labelLoading->setMinimumSize(64, 64);   // or 80x80, 100x100 etc.
-       ui->labelLoading->setMaximumSize(128, 128); // optional
+       ui->labelLoading->setMinimumSize(50, 50);   // or 80x80, 100x100 etc.
+       ui->labelLoading->setMaximumSize(60, 60); // optional
        //ui->labelLoading->setMinimumSize(0, 0);
        //ui->labelLoading->setMaximumSize(QSizePolicy::Ignored, QSizePolicy::Ignored);
        //ui->labelLoading->setSizePolicy(QSizePolicy::Preferred,
