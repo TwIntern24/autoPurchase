@@ -23,14 +23,88 @@
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="0" column="0">
      <widget class="QWidget" name="mainContainer" native="true">
+      <property name="styleSheet">
+       <string notr="true">QWidget {
+    background-color: #7cae7a;
+    color: #000000;
+    font-size: 15pt;
+}
+
+QLineEdit, QComboBox, QDateEdit {
+    background-color: #F8F8FF;
+    border: 1px solid #3a3a3a;
+    padding: 6px 8px;
+}
+
+QLineEdit:focus, QComboBox:focus, QDateEdit:focus {
+    border: 1px solid #4da3ff;
+}
+
+QPushButton {
+    background-color: #FFEBCD;
+    border: 1px solid #3a3a3a;
+    border-radius: 10px;
+    padding: 7px 14px;
+}
+
+QPushButton:hover {
+    background-color: #D2691E;
+}
+
+QPushButton:pressed {
+    background-color: #3a3a3a;
+}
+
+QPushButton:disabled {
+    background-color: #888888;
+    color: #000000;
+}
+
+QListWidget {
+    background-color: #91a55f;
+    border: 1px solid #3a3a3a;
+}
+
+ QTableWidget {
+    background-color: #5fa588;
+    border: 1px solid #3a3a3a;
+}
+
+QScrollBar {
+    background: #6fa66e;
+}
+
+QSpinBox{
+    background-color: #669984;
+    border: 1px solid #3a3a3a;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #495549;
+    color: #ffffff;
+    selection-background-color: #323a58;
+    selection-color: white;
+    border: 1px solid #444;
+    outline: 0;
+}</string>
+      </property>
       <layout class="QVBoxLayout" name="verticalLayout_8">
        <item>
         <widget class="QWidget" name="topBar" native="true">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
              <widget class="QComboBox" name="comboExcel">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="currentText">
                <string/>
               </property>
@@ -52,11 +126,27 @@
            <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0" columnstretch="0,0">
             <item row="0" column="0">
              <widget class="QDateEdit" name="dateEditRequest">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="maximumSize">
                <size>
-                <width>125</width>
+                <width>150</width>
                 <height>16777215</height>
                </size>
+              </property>
+              <property name="calendarPopup">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="labelSearchResult">
+              <property name="text">
+               <string/>
               </property>
              </widget>
             </item>
@@ -75,15 +165,14 @@
             </item>
             <item row="1" column="1">
              <widget class="QPushButton" name="btnSearchMaterial">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text">
                <string>Search</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="labelSearchResult">
-              <property name="text">
-               <string/>
               </property>
              </widget>
             </item>
@@ -94,11 +183,17 @@
        </item>
        <item>
         <widget class="QWidget" name="loadingBar" native="true">
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,1">
           <item>
            <widget class="QLabel" name="labelLoading">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -132,6 +227,9 @@
        </item>
        <item>
         <widget class="QWidget" name="contentArea" native="true">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="5,10,1">
           <item>
            <widget class="QWidget" name="leftpanel" native="true">
@@ -140,6 +238,9 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_5">
              <item>
@@ -163,6 +264,9 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
             <layout class="QVBoxLayout" name="verticalLayout_6">
              <item>
               <widget class="QTableWidget" name="tableWidgetParts">
@@ -172,6 +276,21 @@
                  <height>0</height>
                 </size>
                </property>
+               <property name="verticalScrollBarPolicy">
+                <enum>Qt::ScrollBarAsNeeded</enum>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAsNeeded</enum>
+               </property>
+               <property name="sizeAdjustPolicy">
+                <enum>QAbstractScrollArea::AdjustIgnored</enum>
+               </property>
+               <property name="verticalScrollMode">
+                <enum>QAbstractItemView::ScrollPerItem</enum>
+               </property>
+               <attribute name="horizontalHeaderStretchLastSection">
+                <bool>true</bool>
+               </attribute>
               </widget>
              </item>
             </layout>
@@ -179,6 +298,9 @@
           </item>
           <item>
            <widget class="QWidget" name="rightSideButtons" native="true">
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
             <layout class="QVBoxLayout" name="verticalLayout_7">
              <item>
               <layout class="QVBoxLayout" name="verticalLayout">
@@ -206,6 +328,9 @@
        </item>
        <item>
         <widget class="QWidget" name="bottomBar" native="true">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
            <widget class="QPushButton" name="btnSubmit">

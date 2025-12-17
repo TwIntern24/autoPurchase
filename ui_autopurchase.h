@@ -45,9 +45,9 @@ public:
     QPushButton *btnLoadJob;
     QGridLayout *gridLayout;
     QDateEdit *dateEditRequest;
+    QLabel *labelSearchResult;
     QLineEdit *lineSearchMaterial;
     QPushButton *btnSearchMaterial;
-    QLabel *labelSearchResult;
     QWidget *loadingBar;
     QHBoxLayout *horizontalLayout_3;
     QLabel *labelLoading;
@@ -85,12 +85,77 @@ public:
         gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
         mainContainer = new QWidget(centralWidget);
         mainContainer->setObjectName(QStringLiteral("mainContainer"));
+        mainContainer->setStyleSheet(QLatin1String("QWidget {\n"
+"    background-color: #7cae7a;\n"
+"    color: #000000;\n"
+"    font-size: 15pt;\n"
+"}\n"
+"\n"
+"QLineEdit, QComboBox, QDateEdit {\n"
+"    background-color: #F8F8FF;\n"
+"    border: 1px solid #3a3a3a;\n"
+"    padding: 6px 8px;\n"
+"}\n"
+"\n"
+"QLineEdit:focus, QComboBox:focus, QDateEdit:focus {\n"
+"    border: 1px solid #4da3ff;\n"
+"}\n"
+"\n"
+"QPushButton {\n"
+"    background-color: #FFEBCD;\n"
+"    border: 1px solid #3a3a3a;\n"
+"    border-radius: 10px;\n"
+"    padding: 7px 14px;\n"
+"}\n"
+"\n"
+"QPushButton:hover {\n"
+"    background-color: #D2691E;\n"
+"}\n"
+"\n"
+"QPushButton:pressed {\n"
+"    background-color: #3a3a3a;\n"
+"}\n"
+"\n"
+"QPushButton:disabled {\n"
+"    background-color: #888888;\n"
+"    color: #000000;\n"
+"}\n"
+"\n"
+"QListWidget {\n"
+"    background-color: #91a55f;\n"
+"    border: 1px solid #3a3a3a;\n"
+"}\n"
+"\n"
+" QTableWidget {\n"
+"    background-color: #5fa588;\n"
+"    border: 1px solid #3a3a3a;\n"
+"}\n"
+"\n"
+"QScrollBar {\n"
+"    background: #6fa66e;\n"
+"}\n"
+"\n"
+"QSpinBox{\n"
+"    "
+                        "background-color: #669984;\n"
+"    border: 1px solid #3a3a3a;\n"
+"}\n"
+"\n"
+"QComboBox QAbstractItemView {\n"
+"    background-color: #495549;\n"
+"    color: #ffffff;\n"
+"    selection-background-color: #323a58;\n"
+"    selection-color: white;\n"
+"    border: 1px solid #444;\n"
+"    outline: 0;\n"
+"}"));
         verticalLayout_8 = new QVBoxLayout(mainContainer);
         verticalLayout_8->setSpacing(6);
         verticalLayout_8->setContentsMargins(11, 11, 11, 11);
         verticalLayout_8->setObjectName(QStringLiteral("verticalLayout_8"));
         topBar = new QWidget(mainContainer);
         topBar->setObjectName(QStringLiteral("topBar"));
+        topBar->setStyleSheet(QStringLiteral(""));
         horizontalLayout = new QHBoxLayout(topBar);
         horizontalLayout->setSpacing(6);
         horizontalLayout->setContentsMargins(11, 11, 11, 11);
@@ -100,6 +165,11 @@ public:
         verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
         comboExcel = new QComboBox(topBar);
         comboExcel->setObjectName(QStringLiteral("comboExcel"));
+        QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(comboExcel->sizePolicy().hasHeightForWidth());
+        comboExcel->setSizePolicy(sizePolicy);
 
         verticalLayout_3->addWidget(comboExcel);
 
@@ -121,29 +191,33 @@ public:
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         dateEditRequest = new QDateEdit(topBar);
         dateEditRequest->setObjectName(QStringLiteral("dateEditRequest"));
-        dateEditRequest->setMaximumSize(QSize(125, 16777215));
+        dateEditRequest->setMinimumSize(QSize(0, 0));
+        dateEditRequest->setMaximumSize(QSize(150, 16777215));
+        dateEditRequest->setCalendarPopup(true);
 
         gridLayout->addWidget(dateEditRequest, 0, 0, 1, 1);
-
-        lineSearchMaterial = new QLineEdit(topBar);
-        lineSearchMaterial->setObjectName(QStringLiteral("lineSearchMaterial"));
-        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(lineSearchMaterial->sizePolicy().hasHeightForWidth());
-        lineSearchMaterial->setSizePolicy(sizePolicy);
-
-        gridLayout->addWidget(lineSearchMaterial, 1, 0, 1, 1);
-
-        btnSearchMaterial = new QPushButton(topBar);
-        btnSearchMaterial->setObjectName(QStringLiteral("btnSearchMaterial"));
-
-        gridLayout->addWidget(btnSearchMaterial, 1, 1, 1, 1);
 
         labelSearchResult = new QLabel(topBar);
         labelSearchResult->setObjectName(QStringLiteral("labelSearchResult"));
 
         gridLayout->addWidget(labelSearchResult, 2, 0, 1, 1);
+
+        lineSearchMaterial = new QLineEdit(topBar);
+        lineSearchMaterial->setObjectName(QStringLiteral("lineSearchMaterial"));
+        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(lineSearchMaterial->sizePolicy().hasHeightForWidth());
+        lineSearchMaterial->setSizePolicy(sizePolicy1);
+
+        gridLayout->addWidget(lineSearchMaterial, 1, 0, 1, 1);
+
+        btnSearchMaterial = new QPushButton(topBar);
+        btnSearchMaterial->setObjectName(QStringLiteral("btnSearchMaterial"));
+        sizePolicy1.setHeightForWidth(btnSearchMaterial->sizePolicy().hasHeightForWidth());
+        btnSearchMaterial->setSizePolicy(sizePolicy1);
+
+        gridLayout->addWidget(btnSearchMaterial, 1, 1, 1, 1);
 
 
         horizontalLayout->addLayout(gridLayout);
@@ -153,26 +227,25 @@ public:
 
         loadingBar = new QWidget(mainContainer);
         loadingBar->setObjectName(QStringLiteral("loadingBar"));
+        loadingBar->setLayoutDirection(Qt::LeftToRight);
+        loadingBar->setStyleSheet(QStringLiteral(""));
         horizontalLayout_3 = new QHBoxLayout(loadingBar);
         horizontalLayout_3->setSpacing(6);
         horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
         labelLoading = new QLabel(loadingBar);
         labelLoading->setObjectName(QStringLiteral("labelLoading"));
-        QSizePolicy sizePolicy1(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(labelLoading->sizePolicy().hasHeightForWidth());
-        labelLoading->setSizePolicy(sizePolicy1);
+        QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(labelLoading->sizePolicy().hasHeightForWidth());
+        labelLoading->setSizePolicy(sizePolicy2);
         labelLoading->setAlignment(Qt::AlignCenter);
 
         horizontalLayout_3->addWidget(labelLoading);
 
         labelStatus = new QLabel(loadingBar);
         labelStatus->setObjectName(QStringLiteral("labelStatus"));
-        QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(labelStatus->sizePolicy().hasHeightForWidth());
         labelStatus->setSizePolicy(sizePolicy2);
         labelStatus->setAlignment(Qt::AlignCenter);
@@ -186,6 +259,7 @@ public:
 
         contentArea = new QWidget(mainContainer);
         contentArea->setObjectName(QStringLiteral("contentArea"));
+        contentArea->setStyleSheet(QStringLiteral(""));
         horizontalLayout_5 = new QHBoxLayout(contentArea);
         horizontalLayout_5->setSpacing(6);
         horizontalLayout_5->setContentsMargins(11, 11, 11, 11);
@@ -197,6 +271,7 @@ public:
         sizePolicy3.setVerticalStretch(0);
         sizePolicy3.setHeightForWidth(leftpanel->sizePolicy().hasHeightForWidth());
         leftpanel->setSizePolicy(sizePolicy3);
+        leftpanel->setStyleSheet(QStringLiteral(""));
         verticalLayout_5 = new QVBoxLayout(leftpanel);
         verticalLayout_5->setSpacing(6);
         verticalLayout_5->setContentsMargins(11, 11, 11, 11);
@@ -214,6 +289,7 @@ public:
         rightpanel->setObjectName(QStringLiteral("rightpanel"));
         sizePolicy3.setHeightForWidth(rightpanel->sizePolicy().hasHeightForWidth());
         rightpanel->setSizePolicy(sizePolicy3);
+        rightpanel->setStyleSheet(QStringLiteral(""));
         verticalLayout_6 = new QVBoxLayout(rightpanel);
         verticalLayout_6->setSpacing(6);
         verticalLayout_6->setContentsMargins(11, 11, 11, 11);
@@ -221,6 +297,11 @@ public:
         tableWidgetParts = new QTableWidget(rightpanel);
         tableWidgetParts->setObjectName(QStringLiteral("tableWidgetParts"));
         tableWidgetParts->setMinimumSize(QSize(0, 0));
+        tableWidgetParts->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        tableWidgetParts->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        tableWidgetParts->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
+        tableWidgetParts->setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
+        tableWidgetParts->horizontalHeader()->setStretchLastSection(true);
 
         verticalLayout_6->addWidget(tableWidgetParts);
 
@@ -229,6 +310,7 @@ public:
 
         rightSideButtons = new QWidget(contentArea);
         rightSideButtons->setObjectName(QStringLiteral("rightSideButtons"));
+        rightSideButtons->setStyleSheet(QStringLiteral(""));
         verticalLayout_7 = new QVBoxLayout(rightSideButtons);
         verticalLayout_7->setSpacing(6);
         verticalLayout_7->setContentsMargins(11, 11, 11, 11);
@@ -260,14 +342,15 @@ public:
 
         bottomBar = new QWidget(mainContainer);
         bottomBar->setObjectName(QStringLiteral("bottomBar"));
+        bottomBar->setStyleSheet(QStringLiteral(""));
         horizontalLayout_4 = new QHBoxLayout(bottomBar);
         horizontalLayout_4->setSpacing(6);
         horizontalLayout_4->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
         btnSubmit = new QPushButton(bottomBar);
         btnSubmit->setObjectName(QStringLiteral("btnSubmit"));
-        sizePolicy.setHeightForWidth(btnSubmit->sizePolicy().hasHeightForWidth());
-        btnSubmit->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(btnSubmit->sizePolicy().hasHeightForWidth());
+        btnSubmit->setSizePolicy(sizePolicy1);
 
         horizontalLayout_4->addWidget(btnSubmit);
 
@@ -292,9 +375,9 @@ public:
         AutoPurchase->setWindowTitle(QApplication::translate("AutoPurchase", "AutoPurchase", Q_NULLPTR));
         comboExcel->setCurrentText(QString());
         btnLoadJob->setText(QApplication::translate("AutoPurchase", "Automatic Robot Parts Select", Q_NULLPTR));
+        labelSearchResult->setText(QString());
         lineSearchMaterial->setPlaceholderText(QApplication::translate("AutoPurchase", "Enter Material Id", Q_NULLPTR));
         btnSearchMaterial->setText(QApplication::translate("AutoPurchase", "Search", Q_NULLPTR));
-        labelSearchResult->setText(QString());
         labelLoading->setText(QApplication::translate("AutoPurchase", "l", Q_NULLPTR));
         labelStatus->setText(QString());
         btnClearManual->setText(QApplication::translate("AutoPurchase", "Clear Manual search items", Q_NULLPTR));
