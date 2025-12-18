@@ -1,6 +1,8 @@
 #include "autopurchase.h"
 #include "ui_autopurchase.h"
 
+#include <QDebug>
+
 
 void AutoPurchase::onExcelSelectionChanged(int index)
 {
@@ -52,4 +54,38 @@ void AutoPurchase::onExcelLoadFailed(const QString &error)
     ui->labelStatus->setText("Error: " + error);
     //qDebug() << "Excel load failed:" << error
                // << "target:" << (m_currentLoadTarget == LoadMaterials ? "Materials" : "Matrix");
+}
+
+
+void AutoPurchase::onMaterialsLoaded(const QVariantList &rows)
+{
+    m_rowsMaterials = rows;
+    qDebug() << "Materials rows loaded:" << m_rowsMaterials.size();
+}
+
+void AutoPurchase::onMaterialsLoadFailed(const QString &error)
+{
+    qDebug() << "Materials Excel load failed:" << error;
+}
+
+void AutoPurchase::onArmUpgradeLoaded(const QVariantList &rows)
+{
+    m_rowsArmUpgrade = rows;
+    qDebug() << "ARM upgrade rows loaded:" << m_rowsArmUpgrade.size();
+}
+
+void AutoPurchase::onArmUpgradeLoadFailed(const QString &error)
+{
+    qDebug() << "ARM upgrade Excel load failed:" << error;
+}
+
+void AutoPurchase::onDmUpgradeLoaded(const QVariantList &rows)
+{
+    m_rowsDmUpgrade = rows;
+    qDebug() << "DM Lika upgrade rows loaded:" << m_rowsDmUpgrade.size();
+}
+
+void AutoPurchase::onDmUpgradeLoadFailed(const QString &error)
+{
+    qDebug() << "DM Lika Excel load failed:" << error;
 }

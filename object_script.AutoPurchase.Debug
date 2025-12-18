@@ -1,0 +1,12 @@
+INPUT(
+./debug\main.o
+./debug\autopurchase.o
+./debug\excelloader.o
+./debug\autopurchase_excel.o
+./debug\autopurchase_checklist.o
+./debug\autopurchase_job.o
+./debug\autopurchase_export.o
+./debug\qrc_appresources.o
+./debug\moc_autopurchase.o
+./debug\moc_excelloader.o
+);

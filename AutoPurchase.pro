@@ -28,7 +28,9 @@ SOURCES += main.cpp\
         autopurchase.cpp \
     excelloader.cpp \
     autopurchase_excel.cpp \
-    autopurchase_checklist.cpp
+    autopurchase_checklist.cpp \
+    autopurchase_job.cpp \
+    autopurchase_export.cpp
 
 HEADERS  += autopurchase.h \
     excelloader.h

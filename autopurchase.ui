@@ -14,7 +14,113 @@
    <string>AutoPurchase</string>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">QWidget {
+    background-color: #22362B;
+    color: #F2F2F2;
+    font-size: 15pt;
+}
+
+QLineEdit, QComboBox, QDateEdit, QSpinBox {
+    background-color: #2B4A3A;
+    border: 1px solid #3B5E4F;
+    padding: 6px 8px;
+    selection-background-color: #C9A227;  /* gold */
+    selection-color: #1B1B1B;
+}
+
+QLineEdit:focus, QComboBox:focus, QDateEdit:focus, QSpinBox:focus {
+    border: 1px solid #C9A227;
+}
+
+QPushButton {
+    background-color: #FCE6C9;
+    color: #1B1B1B;
+    border: 1px solid #BFA880;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-weight: 600;
+}
+
+QPushButton:hover {
+    background-color: #EFD4A8;
+}
+
+QPushButton:pressed {
+    background-color: #D8BE92;
+}
+
+QPushButton:disabled {
+    background-color: #6E746F;
+    color: #2B2E2E;
+    border-color: #555;
+}
+
+QListWidget {
+    background-color: #2E4A3B;   /* lighter */
+    border: 1px solid #3F6A56;
+    border-radius: 10px;
+}
+QListWidget::item:selected {
+    background-color: #7FAF96;
+    color: #102018;
+}
+
+ QTableWidget {
+    background-color: #1F3529;   /* darker */
+    alternate-background-color: #243F31;
+    border: 1px solid #345244;
+    border-radius: 10px;
+   gridline-color: #3F6A56;
+}
+
+QTableWidget::item:selected {
+    background-color: #C9A227;   /* gold highlight */
+    color: #1B1B1B;
+}
+
+QHeaderView::section {
+    background-color: #48a85a;
+    color: #F2F2F2;
+    padding: 4px 8px;
+}
+
+QTableWidget::item:selected, QListWidget::item:selected {
+    background-color: #C9A227;
+    color: #1B1B1B;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #22362B;
+    color: #F2F2F2;
+    selection-background-color: #C9A227;
+    selection-color: #1B1B1B;
+    border: 1px solid #345244;
+    outline: 0;
+}
+
+QScrollBar {
+    background: #869686;
+}
+
+QScrollBar:vertical {
+    background: #869686;
+}
+
+QScrollBar:horizontal {
+    background: #869686;
+}
+
+/* Scrollbar track (the grey background area) */
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: #869686;   /* same as window bg */
+}
+
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal {
+    background: #869686;
+}
+</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="styleSheet">
@@ -25,68 +131,112 @@
      <widget class="QWidget" name="mainContainer" native="true">
       <property name="styleSheet">
        <string notr="true">QWidget {
-    background-color: #7cae7a;
-    color: #000000;
+    background-color: #22362B;
+    color: #F2F2F2;
     font-size: 15pt;
 }
 
-QLineEdit, QComboBox, QDateEdit {
-    background-color: #F8F8FF;
-    border: 1px solid #3a3a3a;
+QLineEdit, QComboBox, QDateEdit, QSpinBox {
+    background-color: #2B4A3A;
+    border: 1px solid #3B5E4F;
     padding: 6px 8px;
+    selection-background-color: #C9A227;  /* gold */
+    selection-color: #1B1B1B;
 }
 
-QLineEdit:focus, QComboBox:focus, QDateEdit:focus {
-    border: 1px solid #4da3ff;
+QLineEdit:focus, QComboBox:focus, QDateEdit:focus, QSpinBox:focus {
+    border: 1px solid #C9A227;
 }
 
 QPushButton {
-    background-color: #FFEBCD;
-    border: 1px solid #3a3a3a;
+    background-color: #FCE6C9;
+    color: #1B1B1B;
+    border: 1px solid #BFA880;
     border-radius: 10px;
-    padding: 7px 14px;
+    padding: 8px 14px;
+    font-weight: 600;
 }
 
 QPushButton:hover {
-    background-color: #D2691E;
+    background-color: #EFD4A8;
 }
 
 QPushButton:pressed {
-    background-color: #3a3a3a;
+    background-color: #D8BE92;
 }
 
 QPushButton:disabled {
-    background-color: #888888;
-    color: #000000;
+    background-color: #6E746F;
+    color: #2B2E2E;
+    border-color: #555;
 }
 
 QListWidget {
-    background-color: #91a55f;
-    border: 1px solid #3a3a3a;
+    background-color: #2E4A3B;   /* lighter */
+    border: 1px solid #3F6A56;
+    border-radius: 10px;
+}
+QListWidget::item:selected {
+    background-color: #7FAF96;
+    color: #102018;
 }
 
  QTableWidget {
-    background-color: #5fa588;
-    border: 1px solid #3a3a3a;
+    background-color: #1F3529;   /* darker */
+    alternate-background-color: #243F31;
+    border: 1px solid #345244;
+    border-radius: 10px;
+   gridline-color: #3F6A56;
 }
 
-QScrollBar {
-    background: #6fa66e;
+QTableWidget::item:selected {
+    background-color: #C9A227;   /* gold highlight */
+    color: #1B1B1B;
 }
 
-QSpinBox{
-    background-color: #669984;
-    border: 1px solid #3a3a3a;
+QHeaderView::section {
+    background-color: #48a85a;
+    color: #F2F2F2;
+    padding: 4px 8px;
+}
+
+QTableWidget::item:selected, QListWidget::item:selected {
+    background-color: #C9A227;
+    color: #1B1B1B;
 }
 
 QComboBox QAbstractItemView {
-    background-color: #495549;
-    color: #ffffff;
-    selection-background-color: #323a58;
-    selection-color: white;
-    border: 1px solid #444;
+    background-color: #22362B;
+    color: #F2F2F2;
+    selection-background-color: #C9A227;
+    selection-color: #1B1B1B;
+    border: 1px solid #345244;
     outline: 0;
-}</string>
+}
+
+QScrollBar {
+    background: #869686;
+}
+
+QScrollBar:vertical {
+    background: #869686;
+}
+
+QScrollBar:horizontal {
+    background: #869686;
+}
+
+/* Scrollbar track (the grey background area) */
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: #869686;   /* same as window bg */
+}
+
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal {
+    background: #869686;
+}
+</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_8">
        <item>
@@ -137,6 +287,80 @@ QComboBox QAbstractItemView {
                 <width>150</width>
                 <height>16777215</height>
                </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">/* Whole popup */
+QCalendarWidget {
+    background-color: #22362B;
+    color: #F2F2F2;
+    border: 1px solid #345244;
+}
+
+/* Top navigation bar (month/year row) */
+QCalendarWidget QWidget#qt_calendar_navigationbar {
+    background-color: #2B4A3A;
+    color: #F2F2F2;
+}
+
+/* Month/year buttons + arrows */
+QCalendarWidget QToolButton {
+    background-color: #345244;
+    color: #F2F2F2;
+    border: 1px solid #3B5E4F;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+QCalendarWidget QToolButton:hover {
+    background-color: #3E6A59;
+}
+
+/* Month dropdown / year edit */
+QCalendarWidget QMenu {
+    background-color: #22362B;
+    color: #F2F2F2;
+    border: 1px solid #345244;
+}
+QCalendarWidget QSpinBox {
+    background-color: #22362B;
+    color: #F2F2F2;
+    border: 1px solid #345244;
+    border-radius: 6px;
+    padding: 2px 6px;
+}
+
+/* Weekday header row (Sun, Mon, ...) */
+QCalendarWidget QTableView {
+    background-color: #22362B;
+    alternate-background-color: #243F31;
+    gridline-color: #345244;
+}
+QCalendarWidget QHeaderView::section {
+    background-color: #2F5C48;
+    color: #F2F2F2;          /* this removes red/blue if it was coming from header */
+    padding: 4px;
+    border: 0px;
+    font-weight: 600;
+}
+
+/* Day cells */
+QCalendarWidget QAbstractItemView {
+    background-color: #22362B;
+    color: #F2F2F2;          /* this is key: ensures normal text is not inherited oddly */
+    selection-background-color: #C9A227;
+    selection-color: #1B1B1B;
+    outline: 0;
+}
+
+/* Optional: make weekends NOT red/blue */
+QCalendarWidget QAbstractItemView::item {
+    color: #F2F2F2;
+}
+
+/* Optional: “today” cell subtle border */
+QCalendarWidget QAbstractItemView::item:focus {
+    border: 1px solid #C9A227;
+}
+</string>
               </property>
               <property name="calendarPopup">
                <bool>true</bool>
@@ -230,7 +454,7 @@ QComboBox QAbstractItemView {
          <property name="styleSheet">
           <string notr="true"/>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="5,10,1">
+         <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="4,12,1">
           <item>
            <widget class="QWidget" name="leftpanel" native="true">
             <property name="sizePolicy">
@@ -298,21 +522,39 @@ QComboBox QAbstractItemView {
           </item>
           <item>
            <widget class="QWidget" name="rightSideButtons" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="styleSheet">
              <string notr="true"/>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_7">
+            <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0">
              <item>
-              <layout class="QVBoxLayout" name="verticalLayout">
+              <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
                <item>
                 <widget class="QPushButton" name="btnClearManual">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
-                  <string>Clear Manual search items</string>
+                  <string>Clear Manual</string>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QPushButton" name="btnClear">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
                   <string>All Clear</string>
                  </property>

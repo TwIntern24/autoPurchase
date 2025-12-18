@@ -1,0 +1,12 @@
+INPUT(
+./release\main.o
+./release\autopurchase.o
+./release\excelloader.o
+./release\autopurchase_excel.o
+./release\autopurchase_checklist.o
+./release\autopurchase_job.o
+./release\autopurchase_export.o
+./release\qrc_appresources.o
+./release\moc_autopurchase.o
+./release\moc_excelloader.o
+);

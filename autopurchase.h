@@ -9,6 +9,7 @@
 #include <QVariantList>
 #include <QMovie>
 #include <QThread>
+#include <QTimer>
 
 #include "excelloader.h"
 
@@ -93,6 +94,9 @@ private:
     //QStandardItemModel *m_model = nullptr;
 
     bool m_rebuildPending = false;
+    //int  m_rebuildGen = 0;
+    QTimer m_rebuildTimer;
+    int m_checkedCount = 0;
 
     QMovie *m_loadingMovie = nullptr;
     //QMovie *m_model = nullptr;

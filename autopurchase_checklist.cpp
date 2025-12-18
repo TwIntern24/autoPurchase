@@ -2,6 +2,7 @@
 #include "ui_autopurchase.h"
 
 #include <QTimer>
+#include <QSignalBlocker>
 
 
 void AutoPurchase::buildChecklistFromExcelRows(const QVariantList &rows)
@@ -216,54 +217,56 @@ void AutoPurchase::buildChecklistFromExcelRows(const QVariantList &rows)
     }
 }
 
-
 void AutoPurchase::onChecklistItemChanged(QListWidgetItem *item)
 {
-    if (!item)
-        return;
+    if (!item) return;
 
-    // Debug: see what state the changed item has
-    // qDebug() << "itemChanged:" << item->text() << "state:" << item->checkState();
+    // update count incrementally (O(1))
+    if (item->checkState() == Qt::Checked)
+        ++m_checkedCount;
+    else
+        --m_checkedCount;
 
-    // If this item has just become unchecked, check if any other items are still checked
-    if (item->checkState() == Qt::Unchecked) {
-        bool anyChecked = false;
-        for (int i = 0; i < ui->listWidgetChecklist->count(); ++i) {
-            QListWidgetItem *it = ui->listWidgetChecklist->item(i);
-            if (it->checkState() == Qt::Checked) {
-                anyChecked = true;
-                break;
-            }
-        }
+    //m_rebuildTimer.stop();
 
-        // If nothing is checked anymore → hard clear + hide table and stop
-        if (!anyChecked) {
-            // qDebug() << "No checklist items checked → hiding table";
-            //ui->tableWidgetParts->setRowCount(0);
-            //ui->tableWidgetParts->hide();
+    const bool anyChecked = (m_checkedCount > 0);
+    const bool hasManual  = !m_manualParts.isEmpty();
+
+    if (!anyChecked) {
+        if (hasManual) {
             rebuildPartsFromChecklist();
-            return;
+        } else {
+            ui->tableWidgetParts->clearContents();
+            ui->tableWidgetParts->setRowCount(0);
+            ui->tableWidgetParts->hide();
+            updateSubmitEnabled();
         }
+        return;
     }
 
-    // Otherwise, rebuild normally
-    //rebuildPartsFromChecklist();
-
-    // Schedule a rebuild once instead of many times
-        if (m_rebuildPending){
-            return;
-        }
-
-        m_rebuildPending = true;
-        QTimer::singleShot(50, this, [this]() {
-            m_rebuildPending = false;
-            rebuildPartsFromChecklist();
-        });
+    // debounce rebuild
+    m_rebuildTimer.stop();
+    m_rebuildTimer.start();
 }
+
 
 void AutoPurchase::rebuildPartsFromChecklist()
 {
+
+    const bool anyChecked = (m_checkedCount > 0);
+    const bool hasManual  = !m_manualParts.isEmpty();
+
+    if (!anyChecked && !hasManual) {
+        ui->tableWidgetParts->clearContents();
+        ui->tableWidgetParts->setRowCount(0);
+        ui->tableWidgetParts->hide();
+        updateSubmitEnabled();
+        return;
+    }
+
     ui->tableWidgetParts->setUpdatesEnabled(false);
+    ui->tableWidgetParts->setSortingEnabled(false);
+    ui->tableWidgetParts->clearContents();
     ui->tableWidgetParts->setRowCount(0);
 
     QList<PartInfo> allParts;
@@ -361,6 +364,7 @@ void AutoPurchase::rebuildPartsFromChecklist()
     // 3) Show / hide table
     // -----------------------------
     if (allParts.isEmpty()) {
+        ui->tableWidgetParts->setRowCount(0);
         ui->tableWidgetParts->hide();
         ui->tableWidgetParts->setUpdatesEnabled(true);
         updateSubmitEnabled();
@@ -370,8 +374,9 @@ void AutoPurchase::rebuildPartsFromChecklist()
     rebuildPartsTable(allParts);
     ui->tableWidgetParts->show();
 
-    ui->tableWidgetParts->resizeColumnToContents(0);
-    ui->tableWidgetParts->resizeColumnToContents(1);
+    //ui->tableWidgetParts->resizeColumnToContents(0);
+    //ui->tableWidgetParts->resizeColumnToContents(1);
+    ui->tableWidgetParts->setSortingEnabled(true);
     ui->tableWidgetParts->setUpdatesEnabled(true);
 
     updateSubmitEnabled();   // important: enable submit when we have rows
