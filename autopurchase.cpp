@@ -44,7 +44,7 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
 
     ui->tableWidgetParts->setColumnCount(4);
     QStringList headers;
-    headers << "Material Number" << "Item Name" << "Storage Location" << "Quantity";
+    headers << "Material ID" << "Item Name" << "Storage Location" << "Quantity";
     ui->tableWidgetParts->setHorizontalHeaderLabels(headers);
     ui->tableWidgetParts->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tableWidgetParts->verticalHeader()->setVisible(false);
@@ -242,11 +242,14 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
            hh->setSectionResizeMode(0, QHeaderView::ResizeToContents); // Material
            hh->setSectionResizeMode(1, QHeaderView::Stretch);          // Item Name
            hh->setSectionResizeMode(2, QHeaderView::ResizeToContents); // Storage
+           //hh->setSectionResizeMode(2, QHeaderView::Fixed); // Storage
            hh->setSectionResizeMode(3, QHeaderView::Fixed);            // Quantity
 
-           ui->tableWidgetParts->setColumnWidth(3, 90);  // adjust 70–110 as you like
+           ui->tableWidgetParts->setColumnWidth(3, 100);  // adjust 70–110 as you like
+           //ui->tableWidgetParts->setColumnWidth(0,500);
+           //ui->tableWidgetParts->setColumnWidth(2,250);
 
-           //ui->tableWidgetParts->setColumnWidth(0, 140); // or 160
+           //ui->tableWidgetParts->setColumnWidth(0, 500); // or 160
 }
 
 
@@ -473,7 +476,7 @@ void AutoPurchase::rebuildPartsTable(const QList<PartInfo> &allParts)
             spin->setMinimum(0);
             spin->setMaximum(9999);
             spin->setValue(p.qty);
-            spin->setFixedWidth(75);                 // prevents column “ballooning”
+            spin->setFixedWidth(100);                 // prevents column “ballooning”
             spin->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
             ui->tableWidgetParts->setCellWidget(row, 3, spin);
         }
@@ -503,7 +506,7 @@ void AutoPurchase::rebuildPartsTable(const QList<PartInfo> &allParts)
 
     auto *hh = ui->tableWidgetParts->horizontalHeader();
     hh->setSectionResizeMode(0, QHeaderView::Fixed);
-    ui->tableWidgetParts->setColumnWidth(0, maxW + 18);
+    ui->tableWidgetParts->setColumnWidth(0, maxW + 50);
 
     ui->tableWidgetParts->show();
 

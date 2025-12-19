@@ -51,7 +51,6 @@ public:
     QWidget *loadingBar;
     QHBoxLayout *horizontalLayout_3;
     QLabel *labelLoading;
-    QLabel *labelStatus;
     QWidget *contentArea;
     QHBoxLayout *horizontalLayout_5;
     QWidget *leftpanel;
@@ -65,8 +64,7 @@ public:
     QVBoxLayout *verticalLayout;
     QPushButton *btnClearManual;
     QPushButton *btnClear;
-    QWidget *bottomBar;
-    QHBoxLayout *horizontalLayout_4;
+    QLabel *labelStatus;
     QPushButton *btnSubmit;
     QStatusBar *statusBar;
 
@@ -344,8 +342,10 @@ public:
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         dateEditRequest = new QDateEdit(topBar);
         dateEditRequest->setObjectName(QStringLiteral("dateEditRequest"));
+        sizePolicy.setHeightForWidth(dateEditRequest->sizePolicy().hasHeightForWidth());
+        dateEditRequest->setSizePolicy(sizePolicy);
         dateEditRequest->setMinimumSize(QSize(0, 0));
-        dateEditRequest->setMaximumSize(QSize(150, 16777215));
+        dateEditRequest->setMaximumSize(QSize(192, 16777215));
         dateEditRequest->setStyleSheet(QString::fromUtf8("/* Whole popup */\n"
 "QCalendarWidget {\n"
 "    background-color: #22362B;\n"
@@ -470,16 +470,6 @@ public:
 
         horizontalLayout_3->addWidget(labelLoading);
 
-        labelStatus = new QLabel(loadingBar);
-        labelStatus->setObjectName(QStringLiteral("labelStatus"));
-        sizePolicy2.setHeightForWidth(labelStatus->sizePolicy().hasHeightForWidth());
-        labelStatus->setSizePolicy(sizePolicy2);
-        labelStatus->setAlignment(Qt::AlignCenter);
-
-        horizontalLayout_3->addWidget(labelStatus);
-
-        horizontalLayout_3->setStretch(0, 2);
-        horizontalLayout_3->setStretch(1, 1);
 
         verticalLayout_8->addWidget(loadingBar);
 
@@ -563,6 +553,21 @@ public:
 
         verticalLayout->addWidget(btnClear);
 
+        labelStatus = new QLabel(rightSideButtons);
+        labelStatus->setObjectName(QStringLiteral("labelStatus"));
+        sizePolicy2.setHeightForWidth(labelStatus->sizePolicy().hasHeightForWidth());
+        labelStatus->setSizePolicy(sizePolicy2);
+        labelStatus->setAlignment(Qt::AlignCenter);
+
+        verticalLayout->addWidget(labelStatus);
+
+        btnSubmit = new QPushButton(rightSideButtons);
+        btnSubmit->setObjectName(QStringLiteral("btnSubmit"));
+        sizePolicy.setHeightForWidth(btnSubmit->sizePolicy().hasHeightForWidth());
+        btnSubmit->setSizePolicy(sizePolicy);
+
+        verticalLayout->addWidget(btnSubmit);
+
 
         verticalLayout_7->addLayout(verticalLayout);
 
@@ -574,23 +579,6 @@ public:
         horizontalLayout_5->setStretch(2, 1);
 
         verticalLayout_8->addWidget(contentArea);
-
-        bottomBar = new QWidget(mainContainer);
-        bottomBar->setObjectName(QStringLiteral("bottomBar"));
-        bottomBar->setStyleSheet(QStringLiteral(""));
-        horizontalLayout_4 = new QHBoxLayout(bottomBar);
-        horizontalLayout_4->setSpacing(6);
-        horizontalLayout_4->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
-        btnSubmit = new QPushButton(bottomBar);
-        btnSubmit->setObjectName(QStringLiteral("btnSubmit"));
-        sizePolicy1.setHeightForWidth(btnSubmit->sizePolicy().hasHeightForWidth());
-        btnSubmit->setSizePolicy(sizePolicy1);
-
-        horizontalLayout_4->addWidget(btnSubmit);
-
-
-        verticalLayout_8->addWidget(bottomBar);
 
 
         gridLayout_2->addWidget(mainContainer, 0, 0, 1, 1);
@@ -614,9 +602,9 @@ public:
         lineSearchMaterial->setPlaceholderText(QApplication::translate("AutoPurchase", "Enter Material Id", Q_NULLPTR));
         btnSearchMaterial->setText(QApplication::translate("AutoPurchase", "Search", Q_NULLPTR));
         labelLoading->setText(QApplication::translate("AutoPurchase", "l", Q_NULLPTR));
-        labelStatus->setText(QString());
         btnClearManual->setText(QApplication::translate("AutoPurchase", "Clear Manual", Q_NULLPTR));
         btnClear->setText(QApplication::translate("AutoPurchase", "All Clear", Q_NULLPTR));
+        labelStatus->setText(QString());
         btnSubmit->setText(QApplication::translate("AutoPurchase", "Submit", Q_NULLPTR));
     } // retranslateUi
 

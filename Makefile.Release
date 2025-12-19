@@ -250,6 +250,9 @@ release/moc_autopurchase.cpp: C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QMa
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qfactoryinterface.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QThread \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qthread.h \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QTimer \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qtimer.h \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qbasictimer.h \
 		excelloader.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QObject \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QVariant \
@@ -469,6 +472,9 @@ release/main.o: main.cpp autopurchase.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qfactoryinterface.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QThread \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qthread.h \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QTimer \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qtimer.h \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qbasictimer.h \
 		excelloader.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QObject \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QVariant \
@@ -599,6 +605,9 @@ release/autopurchase.o: autopurchase.cpp autopurchase.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qfactoryinterface.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QThread \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qthread.h \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QTimer \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qtimer.h \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qbasictimer.h \
 		excelloader.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QObject \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QVariant \
@@ -684,9 +693,6 @@ release/autopurchase.o: autopurchase.cpp autopurchase.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QSignalBlocker \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QSpinBox \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qspinbox.h \
-		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QTimer \
-		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qtimer.h \
-		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qbasictimer.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QStyleFactory \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qstylefactory.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\autopurchase.o autopurchase.cpp
@@ -881,6 +887,9 @@ release/autopurchase_excel.o: autopurchase_excel.cpp autopurchase.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qfactoryinterface.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QThread \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qthread.h \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QTimer \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qtimer.h \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qbasictimer.h \
 		excelloader.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QObject \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QVariant \
@@ -1067,6 +1076,9 @@ release/autopurchase_checklist.o: autopurchase_checklist.cpp autopurchase.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qfactoryinterface.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QThread \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qthread.h \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QTimer \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qtimer.h \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qbasictimer.h \
 		excelloader.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QObject \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QVariant \
@@ -1130,9 +1142,6 @@ release/autopurchase_checklist.o: autopurchase_checklist.cpp autopurchase.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qtableview.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QVBoxLayout \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QWidget \
-		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QTimer \
-		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qtimer.h \
-		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qbasictimer.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QSignalBlocker
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\autopurchase_checklist.o autopurchase_checklist.cpp
 
@@ -1256,6 +1265,9 @@ release/autopurchase_job.o: autopurchase_job.cpp autopurchase.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qfactoryinterface.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QThread \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qthread.h \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QTimer \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qtimer.h \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qbasictimer.h \
 		excelloader.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QObject \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QVariant \
@@ -1325,7 +1337,8 @@ release/autopurchase_job.o: autopurchase_job.cpp autopurchase.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qdir.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qfileinfo.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qdialog.h \
-		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QFileInfo
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QFileInfo \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QSignalBlocker
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\autopurchase_job.o autopurchase_job.cpp
 
 release/autopurchase_export.o: autopurchase_export.cpp autopurchase.h \
@@ -1448,6 +1461,9 @@ release/autopurchase_export.o: autopurchase_export.cpp autopurchase.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qfactoryinterface.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QThread \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qthread.h \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QTimer \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qtimer.h \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qbasictimer.h \
 		excelloader.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QObject \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QVariant \

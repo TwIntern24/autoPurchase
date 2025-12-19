@@ -9,6 +9,144 @@
 #include <QTextStream>
 #include <QSignalBlocker>
 
+/*
+#include <algorithm>
+
+// QXlsx
+#include "xlsxdocument.h"
+#include "xlsxformat.h"
+
+
+void AutoPurchase::on_btnSubmit_clicked()
+{
+    if (!ui->btnSubmit->isEnabled())
+        return;
+
+    QString fileName = QFileDialog::getSaveFileName(
+        this,
+        tr("Save parts list"),
+        QDir::homePath() + "/Parts_List.xlsx",
+        tr("Excel files (*.xlsx);;All files (*.*)")
+    );
+    if (fileName.isEmpty())
+        return;
+
+    if (!fileName.endsWith(".xlsx", Qt::CaseInsensitive))
+        fileName += ".xlsx";
+
+    const QString dateStr      = ui->dateEditRequest->date().toString("yyyy-MM-dd");
+    const QString requesterStr = ui->comboRequester->currentText().trimmed();
+
+    struct ExportRow {
+        QString material;
+        QString name;
+        QString storage;
+        int qty = 0;
+    };
+
+    QVector<ExportRow> exportRows;
+    exportRows.reserve(ui->tableWidgetParts->rowCount());
+
+    for (int r = 0; r < ui->tableWidgetParts->rowCount(); ++r) {
+        QTableWidgetItem *matItem  = ui->tableWidgetParts->item(r, 0);
+        QTableWidgetItem *nameItem = ui->tableWidgetParts->item(r, 1);
+        QTableWidgetItem *storItem = ui->tableWidgetParts->item(r, 2);
+
+        if (!matItem || !nameItem)
+            continue;
+
+        if (matItem->font().bold()) // skip group headers / subheaders
+            continue;
+
+        QString mat  = matItem->text().trimmed();
+        QString name = nameItem->text().trimmed();
+        QString stor = storItem ? storItem->text().trimmed() : QString();
+
+        int qty = 0;
+        if (QWidget *w = ui->tableWidgetParts->cellWidget(r, 3)) {
+            if (auto *spin = qobject_cast<QSpinBox*>(w))
+                qty = spin->value();
+        }
+
+        if (mat.isEmpty() || qty <= 0)
+            continue;
+
+        exportRows.push_back({mat, name, stor, qty});
+    }
+
+    std::sort(exportRows.begin(), exportRows.end(),
+              [](const ExportRow &a, const ExportRow &b) {
+        bool aHasStorage = !a.storage.trimmed().isEmpty() && a.storage.trimmed() != "-";
+        bool bHasStorage = !b.storage.trimmed().isEmpty() && b.storage.trimmed() != "-";
+
+        if (aHasStorage != bHasStorage)
+            return aHasStorage;
+
+        if (aHasStorage && bHasStorage) {
+            if (a.storage != b.storage)
+                return a.storage < b.storage;
+        }
+        return a.material < b.material;
+    });
+
+    QXlsx::Document xlsx;
+
+    // Formats
+    QXlsx::Format headerFmt;
+    headerFmt.setFontBold(true);
+    headerFmt.setHorizontalAlignment(QXlsx::Format::AlignHCenter);
+    headerFmt.setVerticalAlignment(QXlsx::Format::AlignVCenter);
+
+    QXlsx::Format textLeft;   // Material, Name, Storage
+    textLeft.setHorizontalAlignment(QXlsx::Format::AlignHLeft);
+    textLeft.setVerticalAlignment(QXlsx::Format::AlignVCenter);
+
+    QXlsx::Format intCenter;  // Quantity
+    intCenter.setHorizontalAlignment(QXlsx::Format::AlignHCenter);
+    intCenter.setVerticalAlignment(QXlsx::Format::AlignVCenter);
+
+    // Row 1 headers
+    xlsx.write(1, 1, "Date", headerFmt);
+    xlsx.write(1, 2, "Requester", headerFmt);
+    xlsx.write(1, 3, "Material ID", headerFmt);
+    xlsx.write(1, 4, "Item Name", headerFmt);
+    xlsx.write(1, 5, "Storage Location", headerFmt);
+    xlsx.write(1, 6, "Quantity", headerFmt);
+
+    // Column widths (minimum-ish)
+    xlsx.setColumnWidth(1, 1, 12);  // Date
+    xlsx.setColumnWidth(2, 2, 18);  // Requester
+    xlsx.setColumnWidth(3, 3, 16);  // Material ID
+    xlsx.setColumnWidth(4, 4, 40);  // Item Name
+    xlsx.setColumnWidth(5, 5, 18);  // Storage
+    xlsx.setColumnWidth(6, 6, 10);  // Qty
+
+    // Write data starting from row 2
+    int row = 2;
+    for (const auto &r : exportRows) {
+        xlsx.write(row, 1, dateStr, textLeft);
+        xlsx.write(row, 2, requesterStr, textLeft);
+
+        // IMPORTANT: force Material ID as TEXT so Excel doesn't auto-format
+        xlsx.write(row, 3, r.material, textLeft);
+
+        xlsx.write(row, 4, r.name, textLeft);
+        xlsx.write(row, 5, r.storage, textLeft);
+        xlsx.write(row, 6, r.qty, intCenter);
+
+        ++row;
+    }
+
+    if (!xlsx.saveAs(fileName)) {
+        QMessageBox::warning(this, tr("Export"), tr("Failed to save:\n%1").arg(fileName));
+        return;
+    }
+
+    QMessageBox::information(this,
+        tr("Export"),
+        tr("Export finished.\nFile saved as:\n%1").arg(fileName));
+}
+*/
 void AutoPurchase::on_btnSubmit_clicked()
 {
     if (!ui->btnSubmit->isEnabled())
@@ -130,7 +268,7 @@ void AutoPurchase::on_btnSubmit_clicked()
     // -----------------------------
     // 3) Write header + sorted rows
     // -----------------------------
-    out << "Date,Requester,Material Number,Item Name,Storage Location,Quantity\n";
+    out << "Date,Requester,Material ID,Item Name,Storage Location,Quantity\n";
 
     for (const ExportRow &row : exportRows) {
         out << csv(dateStr)        << ','
@@ -147,6 +285,7 @@ void AutoPurchase::on_btnSubmit_clicked()
                              tr("Export"),
                              tr("Export finished.\nFile saved as:\n%1").arg(fileName));
 }
+
 
 void AutoPurchase::updateSubmitEnabled()
 {

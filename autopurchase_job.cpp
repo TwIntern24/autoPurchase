@@ -42,7 +42,7 @@ void AutoPurchase::onLoadJobFile()
 void AutoPurchase::onJobFileLoaded(const QVariantList &rows)
 {
     m_rowsJob = rows;
-    ui->labelStatus->setText("Done - applied new file checklist to same matrix");
+    ui->labelStatus->setText("Done - modified same matrix");
 
     // Detect header row + columns once
     detectJobColumns();
