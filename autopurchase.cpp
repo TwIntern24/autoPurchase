@@ -250,6 +250,8 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
            //ui->tableWidgetParts->setColumnWidth(2,250);
 
            //ui->tableWidgetParts->setColumnWidth(0, 500); // or 160
+           //connect(ui->btnSubmit, &QPushButton::clicked,
+                  // this, &AutoPurchase::exportPdfFromCurrentTable);
 }
 
 

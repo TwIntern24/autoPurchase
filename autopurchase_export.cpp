@@ -9,6 +9,11 @@
 #include <QTextStream>
 #include <QSignalBlocker>
 
+#include <QPrinter>
+#include <QPainter>
+#include <QFileDialog>
+#include <QFontMetrics>
+
 /*
 #include <algorithm>
 
@@ -147,6 +152,7 @@ void AutoPurchase::on_btnSubmit_clicked()
         tr("Export finished.\nFile saved as:\n%1").arg(fileName));
 }
 */
+
 void AutoPurchase::on_btnSubmit_clicked()
 {
     if (!ui->btnSubmit->isEnabled())
@@ -244,6 +250,7 @@ void AutoPurchase::on_btnSubmit_clicked()
         return a.material < b.material;     // secondary: material ID
     });
     */
+
     std::sort(exportRows.begin(), exportRows.end(),
               [](const ExportRow &a, const ExportRow &b) {
 
@@ -286,6 +293,178 @@ void AutoPurchase::on_btnSubmit_clicked()
                              tr("Export finished.\nFile saved as:\n%1").arg(fileName));
 }
 
+
+/*
+void AutoPurchase::exportPdfFromCurrentTable()
+{
+    // 1) Collect rows exactly like your CSV export
+    struct ExportRow {
+        QString material;
+        QString name;
+        QString storage;
+        int qty = 0;
+    };
+
+    QVector<ExportRow> exportRows;
+    exportRows.reserve(ui->tableWidgetParts->rowCount());
+
+    for (int r = 0; r < ui->tableWidgetParts->rowCount(); ++r) {
+        QTableWidgetItem *matItem  = ui->tableWidgetParts->item(r, 0);
+        QTableWidgetItem *nameItem = ui->tableWidgetParts->item(r, 1);
+        QTableWidgetItem *storItem = ui->tableWidgetParts->item(r, 2);
+
+        if (!matItem || !nameItem) continue;
+        if (matItem->font().bold()) continue; // skip group/sub headers
+
+        QString mat  = matItem->text().trimmed();
+        QString name = nameItem->text().trimmed();
+        QString stor = storItem ? storItem->text().trimmed() : QString();
+
+        int qty = 0;
+        if (QWidget *w = ui->tableWidgetParts->cellWidget(r, 3)) {
+            if (auto *spin = qobject_cast<QSpinBox*>(w))
+                qty = spin->value();
+        }
+
+        if (mat.isEmpty() || qty <= 0) continue;
+
+        exportRows.push_back({mat, name, stor, qty});
+    }
+
+    if (exportRows.isEmpty()) {
+        QMessageBox::information(this, tr("Export PDF"), tr("No rows to export."));
+        return;
+    }
+
+    // 2) Choose file
+    QString fileName = QFileDialog::getSaveFileName(
+        this,
+        tr("Save parts list (PDF)"),
+        QDir::homePath() + "/Parts_List.pdf",
+        tr("PDF files (*.pdf);;All files (*.*)")
+    );
+    if (fileName.isEmpty()) return;
+    if (!fileName.endsWith(".pdf", Qt::CaseInsensitive)) fileName += ".pdf";
+
+    // 3) Printer setup
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(fileName);
+    printer.setPageSize(QPageSize(QPageSize::A4));
+    printer.setOrientation(QPageLayout::Landscape);
+    printer.setPageMargins(QMarginsF(12, 12, 12, 12));
+
+    QPainter p;
+    if (!p.begin(&printer)) {
+        QMessageBox::warning(this, tr("Export PDF"), tr("Cannot write PDF."));
+        return;
+    }
+
+    // 4) Header info
+    const QString dateStr      = ui->dateEditRequest->date().toString("yyyy-MM-dd");
+    const QString requesterStr = ui->comboRequester->currentText().trimmed();
+
+    QRect page = printer.pageRect(QPrinter::DevicePixel);
+    int left = page.left(), top = page.top(), right = page.right(), bottom = page.bottom();
+
+    QFont headerFont = p.font();
+    headerFont.setBold(true);
+
+    QFont normalFont = p.font();
+    normalFont.setBold(false);
+
+    QFontMetrics fm(normalFont);
+    const int rowH    = fm.height() + 10;
+    const int headerH = rowH + 4;
+
+    // Column widths (tweak if needed)
+    const int wMat  = 170;
+    const int wStor = 160;
+    const int wQty  = 80;
+    const int wName = (right - left + 1) - (wMat + wStor + wQty);
+
+    const int xMat  = left;
+    const int xName = xMat + wMat;
+    const int xStor = xName + wName;
+    const int xQty  = xStor + wStor;
+
+    auto drawPageHeader = [&]() -> int {
+        int y = top;
+
+        // Title + meta
+        p.setFont(headerFont);
+        p.drawText(QRect(left, y, right-left+1, headerH),
+                   Qt::AlignLeft | Qt::AlignVCenter,
+                   tr("Parts List"));
+
+        y += headerH;
+
+        p.setFont(normalFont);
+        p.drawText(QRect(left, y, right-left+1, headerH),
+                   Qt::AlignLeft | Qt::AlignVCenter,
+                   tr("Date: %1    Requester: %2").arg(dateStr, requesterStr));
+
+        y += headerH;
+
+        // Table header
+        p.setFont(headerFont);
+
+        // light gray header background
+        p.fillRect(QRect(left, y, right-left+1, headerH), QColor(230,230,230));
+        p.setPen(Qt::black);
+
+        p.drawRect(QRect(xMat,  y, wMat,  headerH));
+        p.drawRect(QRect(xName, y, wName, headerH));
+        p.drawRect(QRect(xStor, y, wStor, headerH));
+        p.drawRect(QRect(xQty,  y, wQty,  headerH));
+
+        p.drawText(QRect(xMat+6,  y, wMat-12,  headerH), Qt::AlignLeft  | Qt::AlignVCenter, tr("Material ID"));
+        p.drawText(QRect(xName+6, y, wName-12, headerH), Qt::AlignLeft  | Qt::AlignVCenter, tr("Item Name"));
+        p.drawText(QRect(xStor+6, y, wStor-12, headerH), Qt::AlignLeft  | Qt::AlignVCenter, tr("Storage Location"));
+        p.drawText(QRect(xQty,    y, wQty,     headerH), Qt::AlignCenter,                  tr("Qty"));
+
+        p.setFont(normalFont);
+        return y + headerH;
+    };
+
+    int y = drawPageHeader();
+
+    auto newPage = [&]() {
+        printer.newPage();
+        y = drawPageHeader();
+    };
+
+    // 5) Draw rows (multi-page)
+    p.setFont(normalFont);
+
+    for (const ExportRow &r : exportRows) {
+        if (y + rowH > bottom) {
+            newPage();
+        }
+
+        // borders
+        p.drawRect(QRect(xMat,  y, wMat,  rowH));
+        p.drawRect(QRect(xName, y, wName, rowH));
+        p.drawRect(QRect(xStor, y, wStor, rowH));
+        p.drawRect(QRect(xQty,  y, wQty,  rowH));
+
+        // text (elide long names)
+        QString name = fm.elidedText(r.name, Qt::ElideRight, wName - 12);
+
+        p.drawText(QRect(xMat+6,  y, wMat-12,  rowH), Qt::AlignLeft  | Qt::AlignVCenter, r.material);
+        p.drawText(QRect(xName+6, y, wName-12, rowH), Qt::AlignLeft  | Qt::AlignVCenter, name);
+        p.drawText(QRect(xStor+6, y, wStor-12, rowH), Qt::AlignLeft  | Qt::AlignVCenter, r.storage);
+        p.drawText(QRect(xQty,    y, wQty,     rowH), Qt::AlignCenter | Qt::AlignVCenter, QString::number(r.qty));
+
+        y += rowH;
+    }
+
+    p.end();
+
+    QMessageBox::information(this, tr("Export PDF"),
+                             tr("PDF exported.\nFile saved as:\n%1").arg(fileName));
+}
+*/
 
 void AutoPurchase::updateSubmitEnabled()
 {

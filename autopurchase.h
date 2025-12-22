@@ -85,6 +85,7 @@ private slots:
     void on_btnSearchMaterial_clicked();
 
     void on_btnSubmit_clicked();
+    //void exportPdfFromCurrentTable();
 
     void on_btnClear_clicked();
 

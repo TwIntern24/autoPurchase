@@ -225,6 +225,7 @@ Makefile: AutoPurchase.pro C:/Qt/Qt5.8.0/5.8/mingw53_32/mkspecs/win32-g++/qmake.
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/lib/qtmaind.prl \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/lib/Qt5AxContainer.prl \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/lib/Qt5AxBase.prl \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/lib/Qt5PrintSupport.prl \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/lib/Qt5Widgets.prl \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/lib/Qt5Gui.prl \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/lib/Qt5Core.prl
@@ -395,6 +396,7 @@ AutoPurchase.pro:
 C:/Qt/Qt5.8.0/5.8/mingw53_32/lib/qtmaind.prl:
 C:/Qt/Qt5.8.0/5.8/mingw53_32/lib/Qt5AxContainer.prl:
 C:/Qt/Qt5.8.0/5.8/mingw53_32/lib/Qt5AxBase.prl:
+C:/Qt/Qt5.8.0/5.8/mingw53_32/lib/Qt5PrintSupport.prl:
 C:/Qt/Qt5.8.0/5.8/mingw53_32/lib/Qt5Widgets.prl:
 C:/Qt/Qt5.8.0/5.8/mingw53_32/lib/Qt5Gui.prl:
 C:/Qt/Qt5.8.0/5.8/mingw53_32/lib/Qt5Core.prl:
