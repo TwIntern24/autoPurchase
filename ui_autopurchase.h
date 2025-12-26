@@ -345,7 +345,7 @@ public:
         sizePolicy.setHeightForWidth(dateEditRequest->sizePolicy().hasHeightForWidth());
         dateEditRequest->setSizePolicy(sizePolicy);
         dateEditRequest->setMinimumSize(QSize(0, 0));
-        dateEditRequest->setMaximumSize(QSize(192, 16777215));
+        dateEditRequest->setMaximumSize(QSize(226, 16777215));
         dateEditRequest->setStyleSheet(QString::fromUtf8("/* Whole popup */\n"
 "QCalendarWidget {\n"
 "    background-color: #22362B;\n"
@@ -575,7 +575,7 @@ public:
         horizontalLayout_5->addWidget(rightSideButtons);
 
         horizontalLayout_5->setStretch(0, 4);
-        horizontalLayout_5->setStretch(1, 12);
+        horizontalLayout_5->setStretch(1, 13);
         horizontalLayout_5->setStretch(2, 1);
 
         verticalLayout_8->addWidget(contentArea);
