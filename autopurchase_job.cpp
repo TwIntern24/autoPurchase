@@ -23,6 +23,7 @@ void AutoPurchase::onLoadJobFile()
         return;
 
     ui->labelStatus->setText("Loading job Excel...");
+    resetAutoRobotInfo();
     emit startJobFileLoad(path);
 
     // Infer robot name from file name
@@ -46,6 +47,8 @@ void AutoPurchase::onJobFileLoaded(const QVariantList &rows)
 
     // Detect header row + columns once
     detectJobColumns();
+
+    extractAutoRobotInfoFromJob();
 
     // Apply file to checklist automatically
     //applyJobToChecklist();

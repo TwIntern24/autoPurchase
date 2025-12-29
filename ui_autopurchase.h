@@ -430,16 +430,16 @@ public:
 
         lineSearchMaterial = new QLineEdit(topBar);
         lineSearchMaterial->setObjectName(QStringLiteral("lineSearchMaterial"));
-        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(lineSearchMaterial->sizePolicy().hasHeightForWidth());
-        lineSearchMaterial->setSizePolicy(sizePolicy1);
+        sizePolicy.setHeightForWidth(lineSearchMaterial->sizePolicy().hasHeightForWidth());
+        lineSearchMaterial->setSizePolicy(sizePolicy);
 
         gridLayout->addWidget(lineSearchMaterial, 1, 0, 1, 1);
 
         btnSearchMaterial = new QPushButton(topBar);
         btnSearchMaterial->setObjectName(QStringLiteral("btnSearchMaterial"));
+        QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(btnSearchMaterial->sizePolicy().hasHeightForWidth());
         btnSearchMaterial->setSizePolicy(sizePolicy1);
 

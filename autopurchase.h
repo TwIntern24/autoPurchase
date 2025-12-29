@@ -162,6 +162,15 @@ private:
     QList<PartInfo> m_manualParts;
 
     void on_btnClearManual_clicked();
+
+    bool    m_autoInfoAvailable = false;
+    QString m_autoRobotNumber;          // last 4 digits of serial
+    QString m_autoRobotName;            // mapped from last 5 digits of 12NC
+
+    void resetAutoRobotInfo();
+    void extractAutoRobotInfoFromJob();
+    //void updateRobotColumnsVisibility();
+
 };
 
 #endif // AUTOPURCHASE_H

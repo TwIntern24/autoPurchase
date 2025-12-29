@@ -236,6 +236,8 @@ void AutoPurchase::onChecklistItemChanged(QListWidgetItem *item)
         if (hasManual) {
             rebuildPartsFromChecklist();
         } else {
+            resetAutoRobotInfo();
+            //updateRobotColumnsVisibility();
             ui->tableWidgetParts->clearContents();
             ui->tableWidgetParts->setRowCount(0);
             ui->tableWidgetParts->hide();

@@ -158,11 +158,36 @@ void AutoPurchase::on_btnSubmit_clicked()
     if (!ui->btnSubmit->isEnabled())
         return;
 
+    QString robotNumber, robotName;
+    if (m_autoInfoAvailable) {
+        robotNumber = m_autoRobotNumber;
+        robotName   = m_autoRobotName;
+    }
+
+    QString baseName = "Parts_List";
+    if (!robotName.isEmpty())
+        baseName = robotName;
+
+    //QString baseName = "Parts_List";
+    //if (m_autoInfoAvailable)
+        //baseName = m_autoRobotName;
+
+    QString fileName = QFileDialog::getSaveFileName(
+        this,
+        tr("Save parts list"),
+        QDir::homePath() + "/" + baseName + ".csv",
+        tr("CSV files (*.csv);;All files (*.*)")
+    );
+
+
+    /*
     QString fileName = QFileDialog::getSaveFileName(
                 this,
                 tr("Save parts list"),
                 QDir::homePath() + "/Parts_List.csv",
                 tr("CSV files (*.csv);;All files (*.*)"));
+    */
+
     if (fileName.isEmpty())
         return;
 
@@ -194,6 +219,7 @@ void AutoPurchase::on_btnSubmit_clicked()
     // 1) Collect all real data rows
     // -----------------------------
     struct ExportRow {
+        QString robot;
         QString material;
         QString name;
         QString storage;
@@ -204,6 +230,7 @@ void AutoPurchase::on_btnSubmit_clicked()
     exportRows.reserve(ui->tableWidgetParts->rowCount());
 
     for (int r = 0; r < ui->tableWidgetParts->rowCount(); ++r) {
+        QTableWidgetItem *robotNameItem = ui->tableWidgetParts->item(r, 3);
         QTableWidgetItem *matItem  = ui->tableWidgetParts->item(r, 0);
         QTableWidgetItem *nameItem = ui->tableWidgetParts->item(r, 1);
         QTableWidgetItem *storItem = ui->tableWidgetParts->item(r, 2);
@@ -216,13 +243,14 @@ void AutoPurchase::on_btnSubmit_clicked()
         if (matItem->font().bold())
             continue;
 
+        QString robotNaming  = robotNameItem->text().trimmed();
         QString mat  = matItem->text().trimmed();
         QString name = nameItem ? nameItem->text().trimmed() : QString();
         QString stor = storItem ? storItem->text().trimmed() : QString();
 
         // quantity from spinbox
         int qty = 0;
-        if (QWidget *w = ui->tableWidgetParts->cellWidget(r, 3)) {
+        if (QWidget *w = ui->tableWidgetParts->cellWidget(r, 4)) {
             if (auto *spin = qobject_cast<QSpinBox*>(w))
                 qty = spin->value();
         }
@@ -232,6 +260,7 @@ void AutoPurchase::on_btnSubmit_clicked()
             continue;
 
         ExportRow row;
+        row.robot = robotNaming;
         row.material = mat;
         row.name     = name;
         row.storage  = stor;
@@ -275,8 +304,20 @@ void AutoPurchase::on_btnSubmit_clicked()
     // -----------------------------
     // 3) Write header + sorted rows
     // -----------------------------
-    out << "Date,Requester,Material ID,Item Name,Storage Location,Quantity\n";
+    //out << "Date,Requester,Material ID,Item Name,Storage Location,Quantity\n";
+    out << "Robot Number,Material ID,Item Name,Storage Location,Quantity,Requester,Date\n";
 
+
+    for (const ExportRow &row : exportRows) {
+        out << csv(row.robot)      << ','
+            << csv(row.material)   << ','
+            << csv(row.name)       << ','
+            << csv(row.storage)    << ','
+            << row.qty             << ','
+            << csv(requesterStr)   << ','
+            << csv(dateStr)        << '\n';
+    }
+    /*
     for (const ExportRow &row : exportRows) {
         out << csv(dateStr)        << ','
             << csv(requesterStr)   << ','
@@ -285,6 +326,7 @@ void AutoPurchase::on_btnSubmit_clicked()
             << csv(row.storage)    << ','
             << row.qty             << '\n';
     }
+    */
 
     file.close();
 
@@ -496,6 +538,8 @@ void AutoPurchase::updateSubmitEnabled()
 
 void AutoPurchase::on_btnClear_clicked()
 {
+    resetAutoRobotInfo();
+    //updateRobotColumnsVisibility();
     // 1) Uncheck all checklist items & remove multipliers
     {
         QSignalBlocker block(ui->listWidgetChecklist);

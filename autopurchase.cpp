@@ -42,9 +42,9 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
 
     ui->btnSubmit->setEnabled(false);
 
-    ui->tableWidgetParts->setColumnCount(4);
+    ui->tableWidgetParts->setColumnCount(5);
     QStringList headers;
-    headers << "Material ID" << "Item Name" << "Storage Location" << "Quantity";
+    headers << "Material ID" << "Item Name" << "Storage Location" << "Robot No." << "Qty";
     ui->tableWidgetParts->setHorizontalHeaderLabels(headers);
     ui->tableWidgetParts->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tableWidgetParts->verticalHeader()->setVisible(false);
@@ -240,12 +240,14 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
 
            // Good layout: name stretches, others fit/fixed
            hh->setSectionResizeMode(0, QHeaderView::ResizeToContents); // Material
-           hh->setSectionResizeMode(1, QHeaderView::Stretch);          // Item Name
-           hh->setSectionResizeMode(2, QHeaderView::ResizeToContents); // Storage
+           hh->setSectionResizeMode(1, QHeaderView::Stretch); // Item Name
+           hh->setSectionResizeMode(2, QHeaderView::ResizeToContents);          // Storage
+           //hh->setSectionResizeMode(2, QHeaderView::ResizeToContents);          // Item Name
+           hh->setSectionResizeMode(3, QHeaderView::ResizeToContents); // Robot number
            //hh->setSectionResizeMode(2, QHeaderView::Fixed); // Storage
-           hh->setSectionResizeMode(3, QHeaderView::Fixed);            // Quantity
+           hh->setSectionResizeMode(4, QHeaderView::Fixed);            // Quantity
 
-           ui->tableWidgetParts->setColumnWidth(3, 100);  // adjust 70–110 as you like
+           ui->tableWidgetParts->setColumnWidth(4, 100);  // adjust 70–110 as you like
            //ui->tableWidgetParts->setColumnWidth(0,500);
            //ui->tableWidgetParts->setColumnWidth(2,250);
 
@@ -280,6 +282,129 @@ AutoPurchase::~AutoPurchase()
     delete ui;
 }
 
+static QString lastNDigits(QString s, int n)
+{
+    QString digits;
+    for (const QChar &ch : s) {
+        if (ch.isDigit()) digits.append(ch);
+    }
+    if (digits.size() < n) return QString();
+    return digits.right(n);
+}
+
+// TODO: replace with your real 5 mappings
+static QString robotNameFrom12NcLast5(const QString &last5)
+{
+    if (last5 == "17075") return "DoubleFold";
+    if (last5 == "49401") return "DoubleFold";
+    if (last5 == "94871") return "Scara";
+    if (last5 == "94861") return "NT";
+    if (last5 == "22862") return "NXT";
+    return QString(); // unknown -> default behavior
+}
+
+void AutoPurchase::resetAutoRobotInfo()
+{
+    m_autoInfoAvailable = false;
+    m_autoRobotNumber.clear();
+    m_autoRobotName.clear();
+}
+
+/*
+void AutoPurchase::updateRobotColumnsVisibility()
+{
+    const bool show = m_autoInfoAvailable;
+    ui->tableWidgetParts->setColumnHidden(3, !show); // Robot Number col
+    //ui->tableWidgetParts->setColumnHidden(1, !show); // Robot Name col
+}
+*/
+
+void AutoPurchase::extractAutoRobotInfoFromJob()
+{
+    resetAutoRobotInfo();
+
+    if (m_rowsJob.isEmpty())
+        return;
+
+    auto getCol = [&](int r, int c) -> QString {
+        if (r < 0 || r >= m_rowsJob.size()) return QString();
+        QVariantList cols = m_rowsJob[r].toList();
+        if (c < 0 || c >= cols.size()) return QString();
+        return cols[c].toString().trimmed();
+    };
+
+    QString serialText;
+    QString ncText;
+
+    for (int r = 0; r < m_rowsJob.size(); ++r) {
+        QVariantList row = m_rowsJob[r].toList();
+        for (int c = 0; c < row.size(); ++c) {
+            QString cell = row[c].toString().trimmed();
+            QString norm = cell.toLower();
+            norm.remove(' ');
+
+            if (norm.contains("unitserialnumber"))
+                serialText = getCol(r, c + 1);
+
+            if (norm.contains("unit12ncreceived"))
+                ncText = getCol(r, c + 1);
+        }
+    }
+
+    // mark: we tried extraction from an auto file
+    m_autoInfoAvailable = true;
+
+    // fill what we can
+    m_autoRobotNumber = lastNDigits(serialText, 4);            // may be empty
+    QString last5     = lastNDigits(ncText, 5);                // may be empty
+    if (!last5.isEmpty())
+        m_autoRobotName = robotNameFrom12NcLast5(last5);       // may be empty if not mapped
+}
+
+/*
+void AutoPurchase::extractAutoRobotInfoFromJob()
+{
+    resetAutoRobotInfo();
+
+    if (m_rowsJob.isEmpty())
+        return;
+
+    auto getCol = [&](int r, int c) -> QString {
+        if (r < 0 || r >= m_rowsJob.size()) return QString();
+        QVariantList cols = m_rowsJob[r].toList();
+        if (c < 0 || c >= cols.size()) return QString();
+        return cols[c].toString().trimmed();
+    };
+
+    QString serialText;
+    QString ncText;
+
+    for (int r = 0; r < m_rowsJob.size(); ++r) {
+        QVariantList row = m_rowsJob[r].toList();
+        for (int c = 0; c < row.size(); ++c) {
+            QString cell = row[c].toString().trimmed();
+            QString norm = cell.toLower();
+            norm.remove(' ');
+
+            if (norm.contains("unitserialnumber")) {
+                serialText = getCol(r, c + 1);
+            } else if (norm.contains("unit12ncreceived")) {
+                ncText = getCol(r, c + 1);
+            }
+        }
+    }
+
+    QString last4 = lastNDigits(serialText, 4);
+    QString last5 = lastNDigits(ncText, 5);
+    QString name  = robotNameFrom12NcLast5(last5);
+
+    if (!last4.isEmpty() && !name.isEmpty()) {
+        m_autoRobotNumber = last4;
+        m_autoRobotName   = name;
+        m_hasAutoJobInfo  = true;
+    }
+}
+*/
 
 QList<AutoPurchase::PartInfo>
 AutoPurchase::findPartsForMaterial(const QString &expr) const
@@ -433,7 +558,7 @@ void AutoPurchase::rebuildPartsTable(const QList<PartInfo> &allParts)
         ui->tableWidgetParts->setItem(headerRow, 0, hdr);
 
         // Optional: span header across all 4 columns
-        ui->tableWidgetParts->setSpan(headerRow, 0, 1, 4);
+        ui->tableWidgetParts->setSpan(headerRow, 0, 1, 5);
 
         int lastSubOrder = -1;
 
@@ -455,7 +580,7 @@ void AutoPurchase::rebuildPartsTable(const QList<PartInfo> &allParts)
                     subHdr->setBackground(QColor("#4E8F6B"));   // muted green
                     subHdr->setForeground(QColor("#FFFFFF"));
                     ui->tableWidgetParts->setItem(srow, 0, subHdr);
-                    ui->tableWidgetParts->setSpan(srow, 0, 1, 4);
+                    ui->tableWidgetParts->setSpan(srow, 0, 1, 5);
                 }
                 lastSubOrder = p.subOrder;
             }
@@ -463,6 +588,10 @@ void AutoPurchase::rebuildPartsTable(const QList<PartInfo> &allParts)
             // Real part row
             int row = ui->tableWidgetParts->rowCount();
             ui->tableWidgetParts->insertRow(row);
+
+            auto *robotNoItem = new QTableWidgetItem(m_autoInfoAvailable ? m_autoRobotNumber : "");
+            robotNoItem->setFlags(Qt::ItemIsEnabled);
+            ui->tableWidgetParts->setItem(row, 3, robotNoItem);
 
             auto *matItem = new QTableWidgetItem(p.materialId);
             ui->tableWidgetParts->setItem(row, 0, matItem);
@@ -480,7 +609,7 @@ void AutoPurchase::rebuildPartsTable(const QList<PartInfo> &allParts)
             spin->setValue(p.qty);
             spin->setFixedWidth(100);                 // prevents column “ballooning”
             spin->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-            ui->tableWidgetParts->setCellWidget(row, 3, spin);
+            ui->tableWidgetParts->setCellWidget(row, 4, spin);
         }
     }
 
@@ -783,7 +912,7 @@ void AutoPurchase::on_btnSearchMaterial_clicked()
     InvLookupResult inv = findInInventory(m_rowsMaterials, id);
 
     if (!inv.found) {
-        QString msg = tr("Material ID \"%1\" not found in inventory.").arg(id);
+        QString msg = tr("ID \"%1\" not found").arg(id);
         QMessageBox::information(this, tr("Material search"), msg);
         if (ui->labelSearchResult)
             ui->labelSearchResult->setText(msg);
