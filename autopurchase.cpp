@@ -40,8 +40,10 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
     m_checklistReady = false;
     m_jobAppliedOnce = false;
 
+    //----1)Submit button hidden initially-----
     ui->btnSubmit->setEnabled(false);
 
+    //----2)Table Columns-----
     ui->tableWidgetParts->setColumnCount(5);
     QStringList headers;
     headers << "Material ID" << "Item Name" << "Storage Location" << "Robot No." << "Qty";
@@ -52,15 +54,16 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
     ui->tableWidgetParts->setEditTriggers(QAbstractItemView::NoEditTriggers); // spinboxes for quantity
     ui->tableWidgetParts->hide();  // show only when we have data
 
+    //----3)list widget hidden initially-----
     ui->listWidgetChecklist->hide();
     //ui->listWidgetParts->hide();
 
+    //-----4)loading gif---------
     m_loadingMovie = new QMovie(":/gif/gif/g0R5.gif", QByteArray(), this);
-       ui->labelLoading->setMovie(m_loadingMovie);
-       ui->labelLoading->setScaledContents(true);
-       //  Give the label a reasonable size so the gif is visible
-       ui->labelLoading->setMinimumSize(50, 50);   // or 80x80, 100x100 etc.
-       ui->labelLoading->setMaximumSize(60, 60); // optional
+    ui->labelLoading->setMovie(m_loadingMovie);
+    ui->labelLoading->setScaledContents(true);
+    ui->labelLoading->setMinimumSize(50, 50);   // or 80x80, 100x100 etc.
+    ui->labelLoading->setMaximumSize(60, 60); // optional
        //ui->labelLoading->setMinimumSize(0, 0);
        //ui->labelLoading->setMaximumSize(QSizePolicy::Ignored, QSizePolicy::Ignored);
        //ui->labelLoading->setSizePolicy(QSizePolicy::Preferred,
@@ -68,22 +71,21 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
 
        //m_loadingMovie->start();
       // ui->labelLoading->adjustSize();
-       ui->labelLoading->hide();  // hidden until loading starts
+    ui->labelLoading->hide();  // hidden until loading starts
 
+    //-----5)Comboexcel selection-------------
     ui->comboExcel->addItem("Select Robot Matrix", "");  // index 0, no file
 
         //  Example: add some Excel files with display name + full path
-        // TODO: change these paths to your real file locations
     QString base = QCoreApplication::applicationDirPath();
-        ui->comboExcel->addItem("Double Fold",   base + "/../data/Repair_matrix DF.xlsx");
-        ui->comboExcel->addItem("MK5",  base + "/../data/Repair_matrix_MK5 1.xlsx");
+    ui->comboExcel->addItem("Double Fold",   base + "/../data/Repair_matrix DF.xlsx");
+    ui->comboExcel->addItem("MK5",  base + "/../data/Repair_matrix_MK5 1.xlsx");
 
-        ui->tableWidgetParts->horizontalHeader()
-            ->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->tableWidgetParts->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-        // 2) When user changes the selection, load that Excel
+        // When user changes the selection, load that Excel
 
-        // worker thread
+        //-----6)worker threads----------
            m_excelThread = new QThread(this);
            m_loader = new ExcelLoader();
            m_loader->moveToThread(m_excelThread);
@@ -156,7 +158,7 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
 
         QString armPath = base + "/../data/DF ARM SET A, B.xlsx";   // <-- adjust filename
         qDebug() << "ARM upgrade Excel:" << armPath << QFileInfo(armPath).exists();
-        emit startArmUpgradeLoad(armPath);   // or a separate signal if you made one
+        emit startArmUpgradeLoad(armPath);   // or a separate signal
 
 
         // ---------- DM LIKA UPGRADE EXCEL ----------
@@ -292,7 +294,7 @@ static QString lastNDigits(QString s, int n)
     return digits.right(n);
 }
 
-// TODO: replace with your real 5 mappings
+
 static QString robotNameFrom12NcLast5(const QString &last5)
 {
     if (last5 == "17075") return "DoubleFold";
@@ -421,7 +423,7 @@ AutoPurchase::findPartsForMaterial(const QString &expr) const
         return cols[c].toString().trimmed();
     };
 
-    // expr like "610846+E-20953*2"
+    // expr like "610846+E-20953*2" in MK5 excel sheet given
     QStringList tokens = expr.split('+', QString::SkipEmptyParts);
 
     for (const QString &rawToken : tokens) {

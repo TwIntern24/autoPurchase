@@ -233,7 +233,7 @@ void AutoPurchase::tryApplyJobToChecklist()
     m_jobAppliedOnce = true;
 }
 
-
+//checks need column from automatic
 void AutoPurchase::detectJobColumns()
 {
     //m_jobHeaderRow    = 10;
