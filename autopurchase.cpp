@@ -78,8 +78,8 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
 
         //  Example: add some Excel files with display name + full path
     QString base = QCoreApplication::applicationDirPath();
-    ui->comboExcel->addItem("Double Fold",   base + "/../data/Repair_matrix DF.xlsx");
-    ui->comboExcel->addItem("MK5",  base + "/../data/Repair_matrix_MK5 1.xlsx");
+    ui->comboExcel->addItem("Double Fold",   base + "/data/Repair_matrix DF.xlsx");
+    ui->comboExcel->addItem("MK5",  base + "/data/Repair_matrix_MK5 1.xlsx");
 
     ui->tableWidgetParts->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
@@ -127,7 +127,7 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
 
             m_materialThread->start();
 
-            QString materialsPath = base + "/../data/03_Inventory_v0.1.xlsx";
+            QString materialsPath = base + "/data/03_Inventory_v0.1.xlsx";
             qDebug() << "Materials Excel path:" << materialsPath
                      << "exists?" << QFileInfo(materialsPath).exists();
             emit startMaterialsLoad(materialsPath);
@@ -156,7 +156,7 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
 
         m_armThread->start();
 
-        QString armPath = base + "/../data/DF ARM SET A, B.xlsx";   // <-- adjust filename
+        QString armPath = base + "/data/DF ARM SET A, B.xlsx";   // <-- adjust filename
         qDebug() << "ARM upgrade Excel:" << armPath << QFileInfo(armPath).exists();
         emit startArmUpgradeLoad(armPath);   // or a separate signal
 
@@ -180,7 +180,7 @@ AutoPurchase::AutoPurchase(QWidget *parent) :
 
         m_dmThread->start();
 
-        QString dmPath = base + "/../data/DF DM LIKA UPGRADE.xlsx";  // <-- adjust filename
+        QString dmPath = base + "/data/DF DM LIKA UPGRADE.xlsx";  // <-- adjust filename
         qDebug() << "DM Lika Excel:" << dmPath << QFileInfo(dmPath).exists();
         emit startDmUpgradeLoad(dmPath);
 
@@ -832,7 +832,7 @@ AutoPurchase::findDmUpgradeParts() const
 void AutoPurchase::loadRequesters()
 {
     QString base = QCoreApplication::applicationDirPath();
-    QString path = base + "/../data/requesters.txt";
+    QString path = base + "/data/requesters.txt";
 
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
