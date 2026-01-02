@@ -166,7 +166,7 @@ void AutoPurchase::on_btnSubmit_clicked()
 
     QString baseName = "Parts_List";
     if (!robotName.isEmpty())
-        baseName = robotName;
+        baseName = robotName + robotNumber;
 
     //QString baseName = "Parts_List";
     //if (m_autoInfoAvailable)

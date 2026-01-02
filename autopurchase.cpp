@@ -591,7 +591,7 @@ void AutoPurchase::rebuildPartsTable(const QList<PartInfo> &allParts)
             int row = ui->tableWidgetParts->rowCount();
             ui->tableWidgetParts->insertRow(row);
 
-            auto *robotNoItem = new QTableWidgetItem(m_autoInfoAvailable ? m_autoRobotNumber : "");
+            auto *robotNoItem = new QTableWidgetItem(m_autoInfoAvailable ? m_autoRobotName+m_autoRobotNumber : "");
             robotNoItem->setFlags(Qt::ItemIsEnabled);
             ui->tableWidgetParts->setItem(row, 3, robotNoItem);
 
