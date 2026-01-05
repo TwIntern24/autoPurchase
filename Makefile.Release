@@ -1338,7 +1338,9 @@ release/autopurchase_job.o: autopurchase_job.cpp autopurchase.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/qfileinfo.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qdialog.h \
 		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QFileInfo \
-		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QSignalBlocker
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtCore/QSignalBlocker \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/QMessageBox \
+		C:/Qt/Qt5.8.0/5.8/mingw53_32/include/QtWidgets/qmessagebox.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\autopurchase_job.o autopurchase_job.cpp
 
 release/autopurchase_export.o: autopurchase_export.cpp autopurchase.h \

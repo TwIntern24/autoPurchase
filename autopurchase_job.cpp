@@ -6,6 +6,7 @@
 #include <QFileInfo>
 
 #include <QSignalBlocker>
+#include <QMessageBox>
 
 // ============================
 //  JOB EXCEL: load + robots
@@ -24,17 +25,26 @@ void AutoPurchase::onLoadJobFile()
 
     ui->labelStatus->setText("Loading job Excel...");
     resetAutoRobotInfo();
-    emit startJobFileLoad(path);
+    //emit startJobFileLoad(path);
 
     // Infer robot name from file name
     QString lower = QFileInfo(path).fileName().toLower();
 
     if (lower.contains("mk5") || lower.contains("mk6")) {
         m_jobRobotFromFile = "MK5";
+        emit startJobFileLoad(path);
     } else if (lower.contains("doublefold") || lower.contains("df") || lower.contains("avr")) {
         m_jobRobotFromFile = "Double Fold";
+        emit startJobFileLoad(path);
     } else {
         m_jobRobotFromFile.clear(); // unknown / not used
+        //onJobFileLoadFailed("error");
+        //QString err = "Incorrect file name";
+        //emit loadFailed(err);
+        //return;
+        ui->labelStatus->setText("Incorrect file name");
+        QMessageBox::information(this, "Job file not usable",
+                                     "Matrix File name Invalid. Can contain mk5,mk6 for MK5. Can contain doublefold,df,avr for Double Fold");
     }
 
     qDebug() << "Robot from job file name:" << m_jobRobotFromFile;
@@ -43,10 +53,19 @@ void AutoPurchase::onLoadJobFile()
 void AutoPurchase::onJobFileLoaded(const QVariantList &rows)
 {
     m_rowsJob = rows;
-    ui->labelStatus->setText("Done - modified same matrix");
+    //qDebug() << rows <<"h1";
+    //ui->labelStatus->setText("Done - modified same matrix");
 
     // Detect header row + columns once
     detectJobColumns();
+
+    if(m_jobColModule <0 || m_jobColNeed < 0){
+        ui->labelStatus->setText("Persisting to prev output");
+        QMessageBox::information(this, "Job file not usable",
+                                     "Module parts or Need column not present");
+        return;
+    }
+    ui->labelStatus->setText("Done - modified same matrix");
 
     extractAutoRobotInfoFromJob();
 
@@ -79,6 +98,7 @@ void AutoPurchase::onJobFileLoaded(const QVariantList &rows)
 
 void AutoPurchase::onJobFileLoadFailed(const QString &error)
 {
+    qDebug() << error;
     ui->labelStatus->setText("Job file load error: " + error);
 }
 
